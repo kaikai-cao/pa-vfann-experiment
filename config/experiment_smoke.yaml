@@ -1,0 +1,28 @@
+# Temporary small-scale smoke-test config (not part of the frozen experiment).
+data:
+  n_vectors: 1000
+  dimension: 128
+  distribution: standard_normal
+  seed: 2026
+query:
+  n_queries: 8
+graph:
+  degree: 16
+  add_reverse_edges: true
+  exact_knn: true
+  chunk_size: 500
+search:
+  top_k: 10
+  budgets: [20, 100, 200]
+  initial_budget: 20
+  bridge_r_values: [1, 2, 4]
+  target_recall: 0.90
+policies:
+  selectivities: [0.05, 0.30]
+  types: [random, clustered]
+  clustered_centers: 3
+  clustered_sigma: 40.0
+correlation:
+  sigma_values: [15.0, 40.0, 120.0, 1000000.0]
+  leakage_budgets: [100, 500]
+  target_selectivity: 0.10

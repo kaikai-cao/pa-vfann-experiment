@@ -1,0 +1,35 @@
+# PA-VFANN-09 / EXP-01 frozen configuration.
+# One master seed drives all randomness; derived streams use SeedSequence(spawn/entropy).
+
+data:
+  n_vectors: 10000
+  dimension: 128
+  distribution: standard_normal
+  seed: 2026
+
+query:
+  n_queries: 200
+
+graph:
+  degree: 16                 # exact-kNN out-degree per node
+  add_reverse_edges: true    # symmetrize by union of forward + reverse edges
+  exact_knn: true
+  chunk_size: 500
+
+search:
+  top_k: 10
+  budgets: [20, 50, 100, 200, 500, 1000]
+  initial_budget: 20         # E1/E2: minimum visits before early stop is allowed
+  bridge_r_values: [1, 2, 4]
+  target_recall: 0.90
+
+policies:
+  selectivities: [0.01, 0.05, 0.10, 0.30]
+  types: [random, clustered]
+  clustered_centers: 3
+  clustered_sigma: 40.0      # governs spatial concentration of the clustered policy
+
+correlation:
+  sigma_values: [15.0, 40.0, 120.0, 1000000.0]  # tight -> diffuse (last ≈ random)
+  leakage_budgets: [100, 500]
+  target_selectivity: 0.10
