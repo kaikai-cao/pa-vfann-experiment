@@ -205,9 +205,9 @@ S(1^λ, I, L_S)   where  L_S = (R_I, ver, q, E, public parameters)
 |---|---|
 | 分支 | `exp03g-batching-one-sided-output` |
 | 基线 commit | `ea09cd3aaf2f58a5516a678f8a7f5c916b233d3a`（EXP-03F 最终 HEAD） |
-| 报告正文 commit | `待提交` |
-| 最终 HEAD | `待推送核验` |
-| 工作区状态 | 提交前已确认除本报告外无改动 |
+| 报告正文 commit | `d5c3d8d4b6c1b3608f8c9e71bfecc72b1f364c78` |
+| 最终 HEAD | 本报告最后一次提交（元数据记录）；报告正文提交的远端引用已由 GitHub API 核验为上述 SHA |
+| 工作区状态 | 元信息提交与推送后 `git status --short` 为空；除本报告外无改动 |
 | 改动范围 | 仅新增 `docs/EXP-03G-BATCHING-ONE-SIDED-OUTPUT.md` |
 | 不修改 | 代码、数据、EXP-01/02/02A/03A/03B/03C/03D/03E/03F 及任何历史结论 |
 
