@@ -241,9 +241,10 @@ Theorem 1 原文：在 CRHF 与 IND-CCA2 加密假设下，敌手在条件 (1)�
 |---|---|
 | 基线 | `d18e7818f834cef77d92cd41ac1cbbdd3a713242` |
 | 分支 | `exp03b-final-feasibility` |
-| 报告 commit | 待提交 |
-| 远端 HEAD | 待推送核验 |
-| 工作区状态 | 报告提交前已确认无其他改动（详见最终汇报） |
+| 报告正文 commit | `5bf3b95d01a1fc7616974ce65f718accd0a5fa4a` |
+| 元数据 commit | 本提交（最终远端 HEAD 见本轮最终汇报） |
+| 远端 HEAD（首次推送后核验） | `5bf3b95d01a1fc7616974ce65f718accd0a5fa4a`，与报告正文 commit 一致 |
+| 工作区状态 | 首次提交推送后 `git status --short` 为空；元数据提交仅修改本报告，无其他改动 |
 
 ---
 
