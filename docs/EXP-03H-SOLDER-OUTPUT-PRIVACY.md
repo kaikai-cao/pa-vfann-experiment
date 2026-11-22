@@ -263,6 +263,7 @@ P2 从 \(j\) 可算出 head 结果线的两条 label（§3.1）：活动 \(D(hd)
 
 | 项 | 内容 |
 | --- | --- |
-| 报告正文 commit | 见最终汇报（提交后补记） |
-| 最终 HEAD | 见最终汇报（推送后补记） |
+| 报告正文 commit | `b84b16bf5f8d1477cb158e511c872444b0fd070b` |
+| 最终 HEAD | 见下方元信息提交（本提交之后的 HEAD 在最终汇报中给出） |
+| 分支推送状态 | 报告正文 commit 已推送至 `origin/exp03h-solder-output-privacy`，`git push` 成功、无 SSL/502 回退 |
 | 工作区状态 | 提交前已确认除本报告外无改动 |
