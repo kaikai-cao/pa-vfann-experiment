@@ -1,0 +1,54 @@
+# PA-VFANN-11 / EXP-02A frozen audit configuration.
+# This audit is READ-ONLY with respect to EXP-02. No search is re-run for the
+# cost tables: candidate counts are taken from the frozen EXP-02 raw CSV.
+#
+# Baseline: branch exp02-no-distance-oracle @ 29ec958241a05ad6a2a419442d3e322a6abd9892
+
+baseline:
+  branch: exp02-no-distance-oracle
+  commit: 29ec958241a05ad6a2a419442d3e322a6abd9892
+  # Paths are resolved relative to the repository root.
+  exp02_root: exp02
+  raw_csv: exp02/results/raw/experiment_results.csv
+  manifest: exp02a/audit/exp02_baseline_manifest.json
+
+# Wire format of EXP-02 (struct little-endian). Model A reproduces EXP-02's
+# candidate_transfer_bytes exactly: 4 B ID + 4 B squared L2 distance.
+serialization:
+  id_bytes: 4
+  distance_bytes: 4
+  vector_component_bytes: 4
+
+# Attribute lengths are NOT measured in EXP-02. They are explicit scan
+# parameters. "baseline" is a declared assumption for a single headline row,
+# never presented as an empirical constant.
+attribute_fields:
+  baseline:
+    acl_bytes: 16
+    ttl_bytes: 8
+    extra_bytes: 8
+  acl_bytes_values: [0, 8, 16, 32, 64]
+  ttl_bytes_values: [0, 8]
+  extra_bytes_values: [0, 8, 16]
+  reference_bytes_values: [4, 8, 16]
+  # Total attribute-record size scan used by the communication-cost figure.
+  total_attribute_scan: [0, 8, 16, 24, 32, 48, 64, 96, 128]
+
+protocol:
+  top_k: 10
+  # Fixed per-message framing for models that need an extra attribute round.
+  # Model A/B report pure field bytes (no framing) to stay comparable with
+  # EXP-02; model C reports framing because it adds a real round trip.
+  request_header_bytes: 64
+  response_header_bytes: 64
+  # Default deployment assumption: client filters locally and does NOT send
+  # the resulting Top-K IDs back to the server.
+  default_feedback_ids: false
+  # Network observer assumption. false = payloads visible in cleartext.
+  network_tls: true
+
+analysis:
+  target_recall: 0.90
+  reference_budget: 500
+  algorithms_for_cost: [E3_FIXED_TRACE]
+  leakage_budgets: [100, 500]

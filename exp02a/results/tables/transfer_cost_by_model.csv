@@ -1,0 +1,145 @@
+policy_type,selectivity_pct,budget,algorithm,model,description,candidate_count_mean,candidate_count_p95,mean_bytes,p95_bytes,server_to_client_mean_bytes,attribute_request_mean_bytes,attribute_response_mean_bytes,feedback_mean_bytes,messages
+clustered,1.0,20,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),2110.52,2789.4499999999985,16888,22320,16888,0,0,0,1
+clustered,1.0,20,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,2110.52,2789.4499999999985,84440,111600,84440,0,0,0,1
+clustered,1.0,20,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,2110.52,2789.4499999999985,118344,156368,33776,16952,67616,0,3
+clustered,1.0,50,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),3887.685,4683.549999999999,31104,37472,31104,0,0,0,1
+clustered,1.0,50,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,3887.685,4683.549999999999,155520,187360,155520,0,0,0,1
+clustered,1.0,50,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,3887.685,4683.549999999999,217856,262432,62208,31168,124480,0,3
+clustered,1.0,100,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),5694.47,6473.399999999999,45552,51792,45552,0,0,0,1
+clustered,1.0,100,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,5694.47,6473.399999999999,227760,258960,227760,0,0,0,1
+clustered,1.0,100,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,5694.47,6473.399999999999,318992,362672,91104,45616,182272,0,3
+clustered,1.0,200,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),7635.405,8217.65,61080,65744,61080,0,0,0,1
+clustered,1.0,200,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,7635.405,8217.65,305400,328720,305400,0,0,0,1
+clustered,1.0,200,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,7635.405,8217.65,427688,460336,122160,61144,244384,0,3
+clustered,1.0,500,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),9465.725,9645.0,75728,77160,75728,0,0,0,1
+clustered,1.0,500,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,9465.725,9645.0,378640,385800,378640,0,0,0,1
+clustered,1.0,500,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,9465.725,9645.0,530224,540248,151456,75792,302976,0,3
+clustered,1.0,1000,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),9930.21,9965.05,79440,79728,79440,0,0,0,1
+clustered,1.0,1000,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,9930.21,9965.05,397200,398640,397200,0,0,0,1
+clustered,1.0,1000,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,9930.21,9965.05,556208,558224,158880,79504,317824,0,3
+clustered,5.0,20,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),2110.52,2789.4499999999985,16888,22320,16888,0,0,0,1
+clustered,5.0,20,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,2110.52,2789.4499999999985,84440,111600,84440,0,0,0,1
+clustered,5.0,20,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,2110.52,2789.4499999999985,118344,156368,33776,16952,67616,0,3
+clustered,5.0,50,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),3887.685,4683.549999999999,31104,37472,31104,0,0,0,1
+clustered,5.0,50,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,3887.685,4683.549999999999,155520,187360,155520,0,0,0,1
+clustered,5.0,50,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,3887.685,4683.549999999999,217856,262432,62208,31168,124480,0,3
+clustered,5.0,100,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),5694.47,6473.399999999999,45552,51792,45552,0,0,0,1
+clustered,5.0,100,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,5694.47,6473.399999999999,227760,258960,227760,0,0,0,1
+clustered,5.0,100,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,5694.47,6473.399999999999,318992,362672,91104,45616,182272,0,3
+clustered,5.0,200,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),7635.405,8217.65,61080,65744,61080,0,0,0,1
+clustered,5.0,200,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,7635.405,8217.65,305400,328720,305400,0,0,0,1
+clustered,5.0,200,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,7635.405,8217.65,427688,460336,122160,61144,244384,0,3
+clustered,5.0,500,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),9465.725,9645.0,75728,77160,75728,0,0,0,1
+clustered,5.0,500,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,9465.725,9645.0,378640,385800,378640,0,0,0,1
+clustered,5.0,500,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,9465.725,9645.0,530224,540248,151456,75792,302976,0,3
+clustered,5.0,1000,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),9930.21,9965.05,79440,79728,79440,0,0,0,1
+clustered,5.0,1000,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,9930.21,9965.05,397200,398640,397200,0,0,0,1
+clustered,5.0,1000,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,9930.21,9965.05,556208,558224,158880,79504,317824,0,3
+clustered,10.0,20,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),2110.52,2789.4499999999985,16888,22320,16888,0,0,0,1
+clustered,10.0,20,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,2110.52,2789.4499999999985,84440,111600,84440,0,0,0,1
+clustered,10.0,20,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,2110.52,2789.4499999999985,118344,156368,33776,16952,67616,0,3
+clustered,10.0,50,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),3887.685,4683.549999999999,31104,37472,31104,0,0,0,1
+clustered,10.0,50,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,3887.685,4683.549999999999,155520,187360,155520,0,0,0,1
+clustered,10.0,50,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,3887.685,4683.549999999999,217856,262432,62208,31168,124480,0,3
+clustered,10.0,100,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),5694.47,6473.399999999999,45552,51792,45552,0,0,0,1
+clustered,10.0,100,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,5694.47,6473.399999999999,227760,258960,227760,0,0,0,1
+clustered,10.0,100,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,5694.47,6473.399999999999,318992,362672,91104,45616,182272,0,3
+clustered,10.0,200,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),7635.405,8217.65,61080,65744,61080,0,0,0,1
+clustered,10.0,200,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,7635.405,8217.65,305400,328720,305400,0,0,0,1
+clustered,10.0,200,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,7635.405,8217.65,427688,460336,122160,61144,244384,0,3
+clustered,10.0,500,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),9465.725,9645.0,75728,77160,75728,0,0,0,1
+clustered,10.0,500,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,9465.725,9645.0,378640,385800,378640,0,0,0,1
+clustered,10.0,500,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,9465.725,9645.0,530224,540248,151456,75792,302976,0,3
+clustered,10.0,1000,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),9930.21,9965.05,79440,79728,79440,0,0,0,1
+clustered,10.0,1000,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,9930.21,9965.05,397200,398640,397200,0,0,0,1
+clustered,10.0,1000,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,9930.21,9965.05,556208,558224,158880,79504,317824,0,3
+clustered,30.0,20,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),2110.52,2789.4499999999985,16888,22320,16888,0,0,0,1
+clustered,30.0,20,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,2110.52,2789.4499999999985,84440,111600,84440,0,0,0,1
+clustered,30.0,20,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,2110.52,2789.4499999999985,118344,156368,33776,16952,67616,0,3
+clustered,30.0,50,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),3887.685,4683.549999999999,31104,37472,31104,0,0,0,1
+clustered,30.0,50,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,3887.685,4683.549999999999,155520,187360,155520,0,0,0,1
+clustered,30.0,50,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,3887.685,4683.549999999999,217856,262432,62208,31168,124480,0,3
+clustered,30.0,100,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),5694.47,6473.399999999999,45552,51792,45552,0,0,0,1
+clustered,30.0,100,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,5694.47,6473.399999999999,227760,258960,227760,0,0,0,1
+clustered,30.0,100,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,5694.47,6473.399999999999,318992,362672,91104,45616,182272,0,3
+clustered,30.0,200,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),7635.405,8217.65,61080,65744,61080,0,0,0,1
+clustered,30.0,200,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,7635.405,8217.65,305400,328720,305400,0,0,0,1
+clustered,30.0,200,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,7635.405,8217.65,427688,460336,122160,61144,244384,0,3
+clustered,30.0,500,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),9465.725,9645.0,75728,77160,75728,0,0,0,1
+clustered,30.0,500,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,9465.725,9645.0,378640,385800,378640,0,0,0,1
+clustered,30.0,500,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,9465.725,9645.0,530224,540248,151456,75792,302976,0,3
+clustered,30.0,1000,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),9930.21,9965.05,79440,79728,79440,0,0,0,1
+clustered,30.0,1000,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,9930.21,9965.05,397200,398640,397200,0,0,0,1
+clustered,30.0,1000,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,9930.21,9965.05,556208,558224,158880,79504,317824,0,3
+random,1.0,20,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),2110.52,2789.4499999999985,16888,22320,16888,0,0,0,1
+random,1.0,20,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,2110.52,2789.4499999999985,84440,111600,84440,0,0,0,1
+random,1.0,20,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,2110.52,2789.4499999999985,118344,156368,33776,16952,67616,0,3
+random,1.0,50,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),3887.685,4683.549999999999,31104,37472,31104,0,0,0,1
+random,1.0,50,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,3887.685,4683.549999999999,155520,187360,155520,0,0,0,1
+random,1.0,50,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,3887.685,4683.549999999999,217856,262432,62208,31168,124480,0,3
+random,1.0,100,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),5694.47,6473.399999999999,45552,51792,45552,0,0,0,1
+random,1.0,100,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,5694.47,6473.399999999999,227760,258960,227760,0,0,0,1
+random,1.0,100,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,5694.47,6473.399999999999,318992,362672,91104,45616,182272,0,3
+random,1.0,200,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),7635.405,8217.65,61080,65744,61080,0,0,0,1
+random,1.0,200,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,7635.405,8217.65,305400,328720,305400,0,0,0,1
+random,1.0,200,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,7635.405,8217.65,427688,460336,122160,61144,244384,0,3
+random,1.0,500,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),9465.725,9645.0,75728,77160,75728,0,0,0,1
+random,1.0,500,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,9465.725,9645.0,378640,385800,378640,0,0,0,1
+random,1.0,500,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,9465.725,9645.0,530224,540248,151456,75792,302976,0,3
+random,1.0,1000,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),9930.21,9965.05,79440,79728,79440,0,0,0,1
+random,1.0,1000,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,9930.21,9965.05,397200,398640,397200,0,0,0,1
+random,1.0,1000,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,9930.21,9965.05,556208,558224,158880,79504,317824,0,3
+random,5.0,20,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),2110.52,2789.4499999999985,16888,22320,16888,0,0,0,1
+random,5.0,20,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,2110.52,2789.4499999999985,84440,111600,84440,0,0,0,1
+random,5.0,20,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,2110.52,2789.4499999999985,118344,156368,33776,16952,67616,0,3
+random,5.0,50,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),3887.685,4683.549999999999,31104,37472,31104,0,0,0,1
+random,5.0,50,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,3887.685,4683.549999999999,155520,187360,155520,0,0,0,1
+random,5.0,50,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,3887.685,4683.549999999999,217856,262432,62208,31168,124480,0,3
+random,5.0,100,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),5694.47,6473.399999999999,45552,51792,45552,0,0,0,1
+random,5.0,100,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,5694.47,6473.399999999999,227760,258960,227760,0,0,0,1
+random,5.0,100,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,5694.47,6473.399999999999,318992,362672,91104,45616,182272,0,3
+random,5.0,200,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),7635.405,8217.65,61080,65744,61080,0,0,0,1
+random,5.0,200,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,7635.405,8217.65,305400,328720,305400,0,0,0,1
+random,5.0,200,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,7635.405,8217.65,427688,460336,122160,61144,244384,0,3
+random,5.0,500,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),9465.725,9645.0,75728,77160,75728,0,0,0,1
+random,5.0,500,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,9465.725,9645.0,378640,385800,378640,0,0,0,1
+random,5.0,500,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,9465.725,9645.0,530224,540248,151456,75792,302976,0,3
+random,5.0,1000,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),9930.21,9965.05,79440,79728,79440,0,0,0,1
+random,5.0,1000,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,9930.21,9965.05,397200,398640,397200,0,0,0,1
+random,5.0,1000,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,9930.21,9965.05,556208,558224,158880,79504,317824,0,3
+random,10.0,20,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),2110.52,2789.4499999999985,16888,22320,16888,0,0,0,1
+random,10.0,20,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,2110.52,2789.4499999999985,84440,111600,84440,0,0,0,1
+random,10.0,20,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,2110.52,2789.4499999999985,118344,156368,33776,16952,67616,0,3
+random,10.0,50,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),3887.685,4683.549999999999,31104,37472,31104,0,0,0,1
+random,10.0,50,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,3887.685,4683.549999999999,155520,187360,155520,0,0,0,1
+random,10.0,50,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,3887.685,4683.549999999999,217856,262432,62208,31168,124480,0,3
+random,10.0,100,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),5694.47,6473.399999999999,45552,51792,45552,0,0,0,1
+random,10.0,100,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,5694.47,6473.399999999999,227760,258960,227760,0,0,0,1
+random,10.0,100,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,5694.47,6473.399999999999,318992,362672,91104,45616,182272,0,3
+random,10.0,200,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),7635.405,8217.65,61080,65744,61080,0,0,0,1
+random,10.0,200,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,7635.405,8217.65,305400,328720,305400,0,0,0,1
+random,10.0,200,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,7635.405,8217.65,427688,460336,122160,61144,244384,0,3
+random,10.0,500,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),9465.725,9645.0,75728,77160,75728,0,0,0,1
+random,10.0,500,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,9465.725,9645.0,378640,385800,378640,0,0,0,1
+random,10.0,500,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,9465.725,9645.0,530224,540248,151456,75792,302976,0,3
+random,10.0,1000,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),9930.21,9965.05,79440,79728,79440,0,0,0,1
+random,10.0,1000,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,9930.21,9965.05,397200,398640,397200,0,0,0,1
+random,10.0,1000,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,9930.21,9965.05,556208,558224,158880,79504,317824,0,3
+random,30.0,20,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),2110.52,2789.4499999999985,16888,22320,16888,0,0,0,1
+random,30.0,20,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,2110.52,2789.4499999999985,84440,111600,84440,0,0,0,1
+random,30.0,20,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,2110.52,2789.4499999999985,118344,156368,33776,16952,67616,0,3
+random,30.0,50,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),3887.685,4683.549999999999,31104,37472,31104,0,0,0,1
+random,30.0,50,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,3887.685,4683.549999999999,155520,187360,155520,0,0,0,1
+random,30.0,50,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,3887.685,4683.549999999999,217856,262432,62208,31168,124480,0,3
+random,30.0,100,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),5694.47,6473.399999999999,45552,51792,45552,0,0,0,1
+random,30.0,100,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,5694.47,6473.399999999999,227760,258960,227760,0,0,0,1
+random,30.0,100,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,5694.47,6473.399999999999,318992,362672,91104,45616,182272,0,3
+random,30.0,200,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),7635.405,8217.65,61080,65744,61080,0,0,0,1
+random,30.0,200,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,7635.405,8217.65,305400,328720,305400,0,0,0,1
+random,30.0,200,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,7635.405,8217.65,427688,460336,122160,61144,244384,0,3
+random,30.0,500,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),9465.725,9645.0,75728,77160,75728,0,0,0,1
+random,30.0,500,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,9465.725,9645.0,378640,385800,378640,0,0,0,1
+random,30.0,500,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,9465.725,9645.0,530224,540248,151456,75792,302976,0,3
+random,30.0,1000,E3_FIXED_TRACE,A,ID + distance only (EXP-02 lower bound; client cannot evaluate predicate),9930.21,9965.05,79440,79728,79440,0,0,0,1
+random,30.0,1000,E3_FIXED_TRACE,B,ID + distance + full ACL/TTL/predicate metadata in one message,9930.21,9965.05,397200,398640,397200,0,0,0,1
+random,30.0,1000,E3_FIXED_TRACE,C,ID + distance + metadata reference; attributes fetched in an extra round,9930.21,9965.05,556208,558224,158880,79504,317824,0,3

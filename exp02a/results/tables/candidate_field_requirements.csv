@@ -1,0 +1,7 @@
+name,holder,currently_transmitted,client_can_obtain_locally,byte_formula,note,model_A_carries_field
+candidate_id,server (graph node id),True,no,id_bytes per candidate,Already in EXP-02. Without it the client cannot name the record.,True
+query_distance,server (lazy distance cache),True,"yes, but only with the full vector",distance_bytes per candidate,Already in EXP-02. Client can recompute only if it has the vector.,True
+acl_attributes,authorization data source / policy owner,False,conditional: only if client holds a local ACL replica,acl_bytes per candidate (scan parameter),Not in EXP-02. Model B sends it; model C sends a reference instead.,False
+ttl_expiration,authorization data source,False,conditional: only with a local freshness source,ttl_bytes per candidate (scan parameter),"Not in EXP-02. Expiration is part of the predicate, not of the match bit.",False
+other_predicate_metadata,authorization data source,False,conditional: only with a local metadata replica,extra_bytes per candidate (scan parameter),Not in EXP-02. Placeholder for any further predicate input.,False
+metadata_reference,server (as opaque pointer),False,no,reference_bytes per candidate (scan parameter),Model C only. The reference is not the attribute value.,False
