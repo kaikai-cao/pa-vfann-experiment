@@ -161,3 +161,11 @@
 3. 之后才是 B3（恶意 P1）、B2（索引绑定）、B5（成本）。
 
 **项目级口径不变**：原始 Afshar 直接单方输出仍为 REJECT（EXP-04 §2.2）；PA-VFANN 核心研究问题继续 HOLD。本轮的语义 A 通过仅指算法层地基 + 电路层结构条件，不外推为完整协议安全，也不复活任何已 NO-GO 的具体贡献。
+
+---
+
+## 附录 A：证据可复现指令
+
+- AST 传递闭包验算：对 `src/pa_vfann/search_common.py` 解析 AST，从 `plan_fixed_trace` 出发收集调用闭包 `{plan_fixed_trace, best_first_search}`，检查两函数体内是否出现禁词标识符 `{policy, policy_mask, authorization, authorized, mask, bits, legal_count, legal_ids, result}`。本轮结果：闭包命中为空，`TRACE_PLAN_POLICY_FREE: True`。
+- 内置测试：`tests/test_algorithms.py` 中 `test_e3_plan_signature_has_no_policy_parameter`、`test_e3_same_trace_for_different_policies`、`test_e3_plan_does_not_touch_policy_object` 三项（本轮环境无 pytest/numpy，未运行时执行；结论基于源码与 AST 静态证据，不依赖运行时）。
+- 原文行号：本地提取文本 `C:/Users/dell/AppData/Local/Temp/afshar-pdf.vR83GB/content.md`，§2.1 执行状态模型 105–124 行、§2.2 wire label/point-permute 128–134 行、§3.2 step 3(f)/(g) 约 343 行、§3.3 模拟器约 368–380 行。
