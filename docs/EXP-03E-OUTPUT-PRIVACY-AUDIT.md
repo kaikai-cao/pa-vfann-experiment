@@ -288,9 +288,10 @@ L_S=(R_I,\ \mathrm{ver},\ q,\ E,\ \text{public parameters}).
 |---|---|
 | 基线 | `d03ef22c6aba29066fef0419c1982dc498096f8b` |
 | 分支 | `exp03e-output-privacy-audit` |
-| 报告正文 commit | 待提交 |
-| 远端 HEAD | 待推送核验 |
-| 工作区状态 | 提交前已确认除本报告外无改动 |
+| 报告正文 commit | `678146ab8e116600ff9132c97b3edbf2d73a580a` |
+| 元数据 commit | 本提交（最终远端 HEAD 见本轮最终汇报） |
+| 远端 HEAD（首次推送后核验） | `678146ab8e116600ff9132c97b3edbf2d73a580a`，首次 `git push` 成功建立远端分支 |
+| 工作区状态 | 报告提交与推送后 `git status --short` 为空；除本报告外无改动 |
 
 ---
 
