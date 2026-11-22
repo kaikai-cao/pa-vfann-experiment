@@ -1,0 +1,6 @@
+# Local smoke-test artefacts are not part of the frozen EXP-02 evidence.
+config/experiment_smoke.yaml
+results/raw/smoke_*.csv
+results/smoke/
+__pycache__/
+.pytest_cache/
