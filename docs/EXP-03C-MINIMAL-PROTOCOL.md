@@ -332,9 +332,10 @@ EXP-03B 的 NO-GO 针对的是"泛化政策隐藏可验证过滤 ANN"选题；�
 |---|---|
 | 基线 | `f5ddc4606123553dc2e8df8d6b34a34e69bb894e` |
 | 分支 | `exp03c-minimal-protocol` |
-| 报告正文 commit | 待提交 |
-| 远端 HEAD（首次推送后核验） | 待推送 |
-| 工作区状态 | 提交前已确认除本报告外无改动 |
+| 报告正文 commit | `acea01803e8b44110816362c877c5f46530a3a0d` |
+| 元数据 commit | 本提交（最终远端 HEAD 见本轮最终汇报） |
+| 远端 HEAD（首次推送回执） | `acea01803e8b44110816362c877c5f46530a3a0d`；首次 `git push` 遇 SSL EOF，`http.version=HTTP/1.1` 重试成功；随后 `ls-remote` 因 CONNECT 502/SSL EOF 暂时不可核验，以推送回执与本地跟踪引用为准 |
+| 工作区状态 | 首次提交推送后 `git status --short` 为空；元数据提交仅修改本报告，无其他改动 |
 
 ---
 
