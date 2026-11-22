@@ -348,9 +348,10 @@ EXP-03C 的 HOLD 建立在"队列 ORAM 写是主导项、专用网络可省掉�
 |---|---|
 | 基线 | `37b71e6479427d84c994ab3162884fdfc710d8db` |
 | 分支 | `exp03d-cost-semantics` |
-| 报告正文 commit | 待提交 |
-| 远端 HEAD | 待推送核验 |
-| 工作区状态 | 提交前已确认除本报告外无改动 |
+| 报告正文 commit | `4cbd65d56afb70d105cc79ac443499e4bce74cd4` |
+| 元数据 commit | 本提交（最终远端 HEAD 见本轮最终汇报） |
+| 远端 HEAD（首次推送后核验） | `4cbd65d56afb70d105cc79ac443499e4bce74cd4`；`git push` 多次遇 SSL EOF / CONNECT 502，改用 GitHub REST API 上传 blob/tree/commit/ref 回退，远端 SHA 与本地 SHA 一致 |
+| 工作区状态 | 报告提交与推送后 `git status --short` 为空；除本报告外无改动 |
 
 ---
 
