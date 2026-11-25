@@ -1,0 +1,13 @@
+{
+  "verdict": "PASS",
+  "synthetic_n": 512,
+  "synthetic_dim": 384,
+  "synthetic_queries": 20,
+  "total_events": 10698,
+  "total_distance_calls": 10698,
+  "event_count_equals_independent_counter": true,
+  "upper_and_level0_events_present": true,
+  "sinkoff_topk_bit_exact": true,
+  "repeat_trace_hash_equal": true,
+  "rebuilt_trace_hash_equal": true
+}

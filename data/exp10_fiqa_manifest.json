@@ -1,0 +1,108 @@
+{
+  "components": {
+    "corpus": {
+      "expected_sha256": "6d2c7e27aeb8c646791178e3e5591a373813642f38d9c992c0a4f6cbf4092f72",
+      "expected_size_bytes": 17662437,
+      "filename": "corpus.jsonl.gz",
+      "path": "data/exp10_component_sources/corpus/corpus.jsonl.gz",
+      "repo_id": "BeIR/fiqa",
+      "revision": "a90551af496e20ce7887c02f07f7ea5c86908fb9",
+      "sha256": "6d2c7e27aeb8c646791178e3e5591a373813642f38d9c992c0a4f6cbf4092f72",
+      "size_bytes": 17662437
+    },
+    "qrels": {
+      "expected_sha256": null,
+      "expected_size_bytes": null,
+      "filename": "test.tsv",
+      "path": "data/exp10_component_sources/qrels/test.tsv",
+      "repo_id": "BeIR/fiqa-qrels",
+      "revision": "93a4617fe9d8263f8055a67a2269eb40b8659c0a",
+      "sha256": "6adc2a640dcdd22bb8b3858f89107adef2a7c3db20a63550dfa7a0f71e379e44",
+      "size_bytes": 25256
+    },
+    "queries": {
+      "expected_sha256": "a683bbedd2fd3b1fcb1a44fbd706daf9aff27291cd99e7a086b3cf7624785acb",
+      "expected_size_bytes": 193723,
+      "filename": "queries.jsonl.gz",
+      "path": "data/exp10_component_sources/queries/queries.jsonl.gz",
+      "repo_id": "BeIR/fiqa",
+      "revision": "01557ca93ac1c5f4ba52cd6955bc44515846f3fa",
+      "sha256": "a683bbedd2fd3b1fcb1a44fbd706daf9aff27291cd99e7a086b3cf7624785acb",
+      "size_bytes": 193723
+    }
+  },
+  "counts": {
+    "corpus": 57638,
+    "qrels_pairs": 1706,
+    "queries_all_splits": 6648,
+    "queries_test": 648
+  },
+  "data_gate": "PASS_COMPONENT_ARTIFACTS",
+  "data_source_description": "BEIR first-party component artifacts, revision-pinned",
+  "experiment": "EXP-10B.1",
+  "extracted": {
+    "corpus_jsonl": {
+      "path": "data/exp10_fiqa_extracted/corpus.jsonl",
+      "rows": 57638,
+      "sha256": "ff593e4df9933955dc3af83be0c3fa28ac7465f627e08c2e53593e734d506517",
+      "size_bytes": 47949497
+    },
+    "queries_jsonl": {
+      "path": "data/exp10_fiqa_extracted/queries.jsonl",
+      "rows": 6648,
+      "sha256": "eede1e61d4a0188940239b53ebc2da91f577a6a34679c812d1eb9090c29877bc",
+      "size_bytes": 706247
+    }
+  },
+  "id_set_hashes": {
+    "corpus_ids_sha256": "a4e2da3969ede12bf8e52ac7543d4785e6dfa1012c2880e262df13cb8e499afb",
+    "qrels_corpus_ids_sha256": "ecbdf753d85cf159ccdf41f2c7916f62d8c050faa9b7615fc6187a528e370fec",
+    "qrels_query_ids_sha256": "0c7406b17b0a5e5d3f9fc1eed82794f701055be45561463835f8d7fe39040f9c",
+    "queries_all_ids_sha256": "91342310e5a4c7d3dbc3da514666ff18f5988d87568197b224a8f461461cc779",
+    "test_query_ids_sha256": "0c7406b17b0a5e5d3f9fc1eed82794f701055be45561463835f8d7fe39040f9c"
+  },
+  "license": {
+    "corpus": "NOT_DECLARED_IN_DATASET_CARD",
+    "qrels": "NOT_DECLARED_IN_DATASET_CARD",
+    "queries": "NOT_DECLARED_IN_DATASET_CARD",
+    "source": "Hugging Face dataset cards at pinned revisions"
+  },
+  "original_zip_md5": {
+    "note": "Original BEIR UKP ZIP was not downloaded; MD5 was not verified in EXP-10B.1.",
+    "status": "NOT_VERIFIED",
+    "value": "17918ed23cd04fb15047f73e6c3bd9d9"
+  },
+  "structure_checks": {
+    "corpus_ids_unique": true,
+    "every_test_query_has_qrels": true,
+    "qrels_corpus_ids_resolve": true,
+    "qrels_header_valid": true,
+    "qrels_pairs_unique": true,
+    "qrels_query_ids_resolve": true,
+    "query_ids_unique": true,
+    "test_query_set_equals_qrels_query_set": true,
+    "test_split_rule": "test query IDs selected from full 6648 queries by qrels query IDs"
+  },
+  "test_query_ids_sample": [
+    "10034",
+    "10039",
+    "10109",
+    "10122",
+    "10136",
+    "10137",
+    "10152",
+    "10183",
+    "10213",
+    "10246",
+    "10267",
+    "104",
+    "10414",
+    "10447",
+    "10462",
+    "10482",
+    "10497",
+    "10526",
+    "10547",
+    "10558"
+  ]
+}

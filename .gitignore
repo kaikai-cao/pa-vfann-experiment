@@ -8,6 +8,8 @@ data/exp10_fiqa_embeddings/
 results/raw/exp10_fiqa_*.bin
 results/raw/exp10_fiqa_*.jsonl
 results/raw/exp10_fiqa_*.npz
+results/raw/exp10_fiqa_smoke/*
+!results/raw/exp10_fiqa_smoke/exp10_fiqa_smoke_validation.json
 __pycache__/
 *.py[cod]
 .pytest_cache/

@@ -1,0 +1,33 @@
+{
+  "artifacts": {
+    "exp10_fiqa_first_touch.jsonl": {
+      "compressed_path": "results/raw/exp10_fiqa_first_touch.jsonl.gz",
+      "compressed_sha256": "88988ef6dc1887f396e11512218573538afd54b36021121515e8a6427ae85e90",
+      "compressed_size_bytes": 52558835,
+      "raw_sha256": "0b85b002ab3aac6b86001cee977ac2cdb40868bd7eaede02d272c9772f42bf35",
+      "raw_size_bytes": 726598992
+    },
+    "exp10_fiqa_hnsw_topk.jsonl": {
+      "compressed_path": "results/raw/exp10_fiqa_hnsw_topk.jsonl.gz",
+      "compressed_sha256": "dce69a8cc9a37a01deee1e9d861f35e0b23257b48746d7f39e4566fd7711094a",
+      "compressed_size_bytes": 356856,
+      "raw_sha256": "651de83146e5045d7b10e24829054542bffb712b724099b7911f3b2ae0e828f3",
+      "raw_size_bytes": 2122592
+    },
+    "exp10_fiqa_probe_summary.jsonl": {
+      "compressed_path": "results/raw/exp10_fiqa_probe_summary.jsonl.gz",
+      "compressed_sha256": "66fc1284e657ac9399d6e394840082c1cd318bce10869bed9b1eea06bf9296e7",
+      "compressed_size_bytes": 107738,
+      "raw_sha256": "fd1bda4db931b53fe935ea3763fb873bdddb9ad3f221b00a62ea9a1bcc318424",
+      "raw_size_bytes": 682378
+    },
+    "exp10_fiqa_trace_events.jsonl": {
+      "compressed_path": "results/raw/exp10_fiqa_trace_events.jsonl.gz",
+      "compressed_sha256": "d27a31fb0bde67a11c117ebafbe5a6bf0fb14dd3b33aaa90efa4330eb0a8e6d8",
+      "compressed_size_bytes": 49754346,
+      "raw_sha256": "5f66c04bc2e0f15098925e372025903dc7db454871ffb9718446c17fdbd8ab2b",
+      "raw_size_bytes": 746501764
+    }
+  },
+  "experiment": "EXP-10B.1"
+}

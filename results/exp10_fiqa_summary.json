@@ -1,0 +1,151 @@
+{
+  "artifacts": {
+    "exp10_fiqa_bootstrap.csv": {
+      "path": "results/exp10_fiqa_bootstrap.csv",
+      "sha256": "fa0b82d3c042ea3e01786b2e617b6a9f7ae8c0f3ce7182956656ef028e981396"
+    },
+    "exp10_fiqa_oracle_prefix.csv": {
+      "path": "results/exp10_fiqa_oracle_prefix.csv",
+      "sha256": "ce06da1807c77db2422cfde100657ce5e4818327efc9fc0cf051cfbf76ba7533"
+    },
+    "exp10_fiqa_prefix_recall.csv": {
+      "path": "results/exp10_fiqa_prefix_recall.csv",
+      "sha256": "f99040636d162c66276d18eaf4effc88ac352d2a9c1797ceaa53a9c7a60afe33"
+    },
+    "exp10_fiqa_recall_gate.json": {
+      "path": "results/exp10_fiqa_recall_gate.json",
+      "sha256": "c05c44f7262faff9bcfc32abf760f66337114ea46129339826e1c715dd7d5f92"
+    },
+    "exp10_fiqa_unfiltered_recall.csv": {
+      "path": "results/exp10_fiqa_unfiltered_recall.csv",
+      "sha256": "b99f21357d0e800117ecb18393a2f6f4eecdb2bc17e9a4742a3535981659ef97"
+    }
+  },
+  "data_gate": "PASS_COMPONENT_ARTIFACTS",
+  "data_manifest_sha256": "6433acebd67dc2c4c0780d19018a70882a866cbf91aa1fe624a1b8918c1b73c0",
+  "experiment": "EXP-10B.1",
+  "group_highlights": {
+    "low_selectivity_full_recall": {
+      "128": 0.5719650205761317,
+      "256": 0.7078189300411523,
+      "64": 0.4266460905349794
+    },
+    "mask_type_full_recall": {
+      "clustered": 0.7318930041152264,
+      "random": 0.8992398262459991
+    }
+  },
+  "gt_manifest_sha256": "8e8ea056918ed1d1ef0e97df364dd19384066c92a5410d122ccea03c364274e1",
+  "hnsw": {
+    "M": 32,
+    "ef_construction": 200,
+    "ef_search": [
+      64,
+      128,
+      256
+    ],
+    "instrumentation": "EXP-10A patch",
+    "k": 10,
+    "library": "hnswlib",
+    "seed": 2026,
+    "space": "cosine-equivalent inner product on normalized float32",
+    "threads": 1,
+    "version": "v0.9.0"
+  },
+  "model": {
+    "batch_size": 256,
+    "cpu_threads": 8,
+    "device": "cpu",
+    "dim": 384,
+    "dtype": "float32",
+    "id": "sentence-transformers/all-MiniLM-L6-v2",
+    "license": "apache-2.0",
+    "normalize_embeddings": true,
+    "requested_revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+    "resolved_revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+    "sentence_convention": {
+      "corpus": "title + newline + text",
+      "query": "query text only"
+    },
+    "test_query_order": "lexicographically sorted qrels query IDs"
+  },
+  "oracle_ratio": {
+    "128": {
+      "0.05": 0.6953824047343545,
+      "0.1": 0.633968901615857
+    },
+    "256": {
+      "0.05": 0.6745109761909939,
+      "0.1": 0.6248353376608882
+    },
+    "64": {
+      "0.05": 0.7136580240352048,
+      "0.1": 0.6393763475664226
+    }
+  },
+  "original_zip_md5_status": "NOT_VERIFIED",
+  "prefix_recall": {
+    "128": {
+      "0.6": 0.7404749657064471,
+      "0.8": 0.7877829218106996,
+      "0.9": 0.8063528806584361,
+      "1.0": 0.8216906721536352
+    },
+    "256": {
+      "0.6": 0.8238683127572016,
+      "0.8": 0.8610939643347052,
+      "0.9": 0.8750514403292181,
+      "1.0": 0.8865997942386831
+    },
+    "64": {
+      "0.6": 0.6421210562414267,
+      "0.8": 0.6994341563786008,
+      "0.9": 0.7204818244170097,
+      "1.0": 0.73840877914952
+    }
+  },
+  "recall_gate": {
+    "all_below_threshold": false,
+    "low_quality_configs": [],
+    "mean_unfiltered_recall10": {
+      "64": 0.9945987654320988,
+      "128": 0.9978395061728396,
+      "256": 0.9995370370370371
+    },
+    "oracle_main_conclusion": "CONTINUE",
+    "rule": "STOP_ORACLE_ONLY_IF_ALL_EFSEARCH_MEAN_UNFILTERED_EXACT_RECALL10_BELOW_0_90",
+    "threshold": 0.9
+  },
+  "smoke_validation": {
+    "event_count_equals_independent_counter": true,
+    "rebuilt_trace_hash_equal": true,
+    "repeat_trace_hash_equal": true,
+    "sinkoff_topk_bit_exact": true,
+    "synthetic_dim": 384,
+    "synthetic_n": 512,
+    "synthetic_queries": 20,
+    "total_distance_calls": 10698,
+    "total_events": 10698,
+    "upper_and_level0_events_present": true,
+    "verdict": "PASS"
+  },
+  "trace_cost": {
+    "128": {
+      "mean_event_count": 2583.320987654321,
+      "mean_unique_count": 2552.7098765432097
+    },
+    "256": {
+      "mean_event_count": 4362.816358024691,
+      "mean_unique_count": 4324.945987654321
+    },
+    "64": {
+      "mean_event_count": 1530.7793209876543,
+      "mean_unique_count": 1505.483024691358
+    }
+  },
+  "unfiltered_mean_recall10": {
+    "64": 0.9945987654320988,
+    "128": 0.9978395061728396,
+    "256": 0.9995370370370371
+  }
+}

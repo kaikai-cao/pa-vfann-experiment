@@ -1,0 +1,12 @@
+{
+  "all_below_threshold": false,
+  "low_quality_configs": [],
+  "mean_unfiltered_recall10": {
+    "64": 0.9945987654320988,
+    "128": 0.9978395061728396,
+    "256": 0.9995370370370371
+  },
+  "oracle_main_conclusion": "CONTINUE",
+  "rule": "STOP_ORACLE_ONLY_IF_ALL_EFSEARCH_MEAN_UNFILTERED_EXACT_RECALL10_BELOW_0_90",
+  "threshold": 0.9
+}

@@ -62,7 +62,24 @@
     "types": ["random", "embedding-clustered"],
     "selectivities": [0.01, 0.10, 0.30],
     "seeds": [2026, 2027, 2028],
-    "count": 18
+    "count": 18,
+    "size_rule": "round(selectivity * 57638)",
+    "random_rule": "numpy.default_rng(seed).choice(N, size=m, replace=false)",
+    "clustered_rule": {
+      "algorithm": "MiniBatchKMeans",
+      "n_clusters": 128,
+      "n_init": 3,
+      "batch_size": 4096,
+      "random_state": "seed",
+      "cluster_ranking": "centroid projected on a seeded unit direction, descending",
+      "direction_rule": "numpy.default_rng(seed + 10000).normal(size=384), normalized",
+      "partial_cluster_rule": "docs in the cutoff cluster sorted by L2 distance to centroid ascending, row index as tie-break"
+    }
+  },
+  "ground_truth": {
+    "sort": "score descending; corpus row index ascending as stable tie-break",
+    "score": "float32 dot product of normalized embeddings",
+    "boundary_tie_check": "exact float32 equality at rank-10 boundary"
   },
   "prefixes": {
     "budget_fractions": [0.60, 0.80, 0.90, 1.00],

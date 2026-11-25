@@ -1,0 +1,23 @@
+{
+  "all_match": true,
+  "checks": 150,
+  "failed": [],
+  "method": "independent sample-level recomputation from raw first-touch and top-k files",
+  "sample_ef_search": [
+    64,
+    128,
+    256
+  ],
+  "sample_masks": [
+    "random_s2026_p01",
+    "clustered_s2027_p10",
+    "random_s2028_p30"
+  ],
+  "sample_query_indices": [
+    0,
+    17,
+    123,
+    321,
+    647
+  ]
+}
