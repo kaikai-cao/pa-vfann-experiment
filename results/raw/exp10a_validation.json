@@ -1,0 +1,60 @@
+{
+  "phase": "EXP-10A Phase 0",
+  "verdict": "PASS",
+  "V1": {
+    "pass": true,
+    "errors": [],
+    "stats": {
+      "queries_checked": 50,
+      "total_events": 28031,
+      "label_mapping_errors": 0,
+      "event_index_errors": 0,
+      "queries_with_level0": 50,
+      "queries_with_upper": 50,
+      "max_counter_minus_event": 0,
+      "site_counts": {
+        "entrypoint": 50,
+        "upper_layer_neighbor": 1244,
+        "level0_entrypoint": 50,
+        "level0_neighbor": 26687
+      }
+    }
+  },
+  "V2": {
+    "pass": true,
+    "errors": [],
+    "rows_compared": 500,
+    "mismatches": {
+      "upstream_vs_instrumented": 0,
+      "instrumented_vs_sinkoff": 0
+    },
+    "comparison": "exact (query_id, rank, external_id, float32 bit pattern)"
+  },
+  "V3": {
+    "pass": true,
+    "errors": [],
+    "stats": {
+      "repeat_hash_match": 50,
+      "rebuilt_hash_match": 50,
+      "first_touch_total": 27047,
+      "derivation_ok": true
+    }
+  },
+  "V4": {
+    "pass": true,
+    "errors": [],
+    "sample_query": 0,
+    "complete_count": 557,
+    "unique_first_touch_count": 536,
+    "repeated_count": 21
+  },
+  "V5": {
+    "pass": true,
+    "errors": [],
+    "added_lines": 98,
+    "disallowed_added_lines": [],
+    "forbidden_tokens": [],
+    "note": "Static audit covers the patch diff only. Scope is single-thread searchKnn; no claim about concurrent trace safety. Build/addPoint path untouched."
+  },
+  "observation_scope": "HNSW query distance-evaluation trace (algorithm level only)"
+}

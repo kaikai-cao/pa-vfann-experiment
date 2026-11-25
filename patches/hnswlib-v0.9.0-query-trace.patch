@@ -1,0 +1,152 @@
+--- a/hnswlib/hnswalg.h
++++ b/hnswlib/hnswalg.h
+@@ -10,6 +10,22 @@
+ #include <list>
+ #include <memory>
+ 
++#ifdef HNSWLIB_TRACE_ENABLED
++// EXP-10A: observation-only instrumentation of the standard query path.
++// hnsw_trace_sink.h must be reachable on the include path when tracing is on.
++#include "hnsw_trace_sink.h"
++#define HNSW_TRACE_SITE(iid, lvl, site)                                    \
++    do {                                                                   \
++        if (g_hnsw_trace_sink_enabled) {                                   \
++            hnsw_trace_emit((uint64_t)(iid),                               \
++                            (uint64_t)getExternalLabel((iid)),             \
++                            (int)(lvl), (site));                           \
++        }                                                                  \
++    } while (0)
++#else
++#define HNSW_TRACE_SITE(iid, lvl, site) do {} while (0)
++#endif
++
+ namespace hnswlib {
+ typedef unsigned int tableint;
+ typedef unsigned int linklistsizeint;
+@@ -102,6 +118,13 @@
+         data_size_ = s->get_data_size();
+         fstdistfunc_ = s->get_dist_func();
+         dist_func_param_ = s->get_dist_func_param();
++#ifdef HNSWLIB_TRACE_ENABLED
++        // EXP-10A: independent distance-call counter. The wrapper delegates
++        // to the upstream function pointer; dist_func_param_ is UNCHANGED.
++        HnswTraceDistState<dist_t>::orig = s->get_dist_func();
++        HnswTraceDistState<dist_t>::orig_param = s->get_dist_func_param();
++        fstdistfunc_ = &hnsw_trace_counting_distfunc<dist_t>;
++#endif
+         if ( M <= 10000 ) {
+             M_ = M;
+         } else {
+@@ -326,6 +349,10 @@
+             (!isMarkedDeleted(ep_id) && ((!isIdAllowed) || (*isIdAllowed)(getExternalLabel(ep_id))))) {
+             char* ep_data = getDataByInternalId(ep_id);
+             dist_t dist = fstdistfunc_(data_point, ep_data, dist_func_param_);
++#ifdef HNSWLIB_TRACE_ENABLED
++            // EXP-10A site 3/4: searchBaseLayerST level-0 entrypoint distance.
++            HNSW_TRACE_SITE(ep_id, 0, "level0_entrypoint");
++#endif
+             lowerBound = dist;
+             top_candidates.emplace(dist, ep_id);
+             if (!bare_bone_search && stop_condition) {
+@@ -387,6 +414,10 @@
+ 
+                     char *currObj1 = (getDataByInternalId(candidate_id));
+                     dist_t dist = fstdistfunc_(data_point, currObj1, dist_func_param_);
++#ifdef HNSWLIB_TRACE_ENABLED
++                    // EXP-10A site 4/4: level-0 candidate distance after visited check.
++                    HNSW_TRACE_SITE(candidate_id, 0, "level0_neighbor");
++#endif
+ 
+                     bool flag_consider_candidate;
+                     if (!bare_bone_search && stop_condition) {
+@@ -747,6 +778,12 @@
+         data_size_ = s->get_data_size();
+         fstdistfunc_ = s->get_dist_func();
+         dist_func_param_ = s->get_dist_func_param();
++#ifdef HNSWLIB_TRACE_ENABLED
++        // EXP-10A: same independent counter wrapper for loaded indexes.
++        HnswTraceDistState<dist_t>::orig = s->get_dist_func();
++        HnswTraceDistState<dist_t>::orig_param = s->get_dist_func_param();
++        fstdistfunc_ = &hnsw_trace_counting_distfunc<dist_t>;
++#endif
+ 
+         auto pos = input.tellg();
+ 
+@@ -1273,6 +1310,10 @@
+ 
+         tableint currObj = enterpoint_node_;
+         dist_t curdist = fstdistfunc_(query_data, getDataByInternalId(enterpoint_node_), dist_func_param_);
++#ifdef HNSWLIB_TRACE_ENABLED
++        // EXP-10A site 1/4: searchKnn entrypoint distance computation.
++        HNSW_TRACE_SITE(enterpoint_node_, maxlevel_, "entrypoint");
++#endif
+ 
+         for (int level = maxlevel_; level > 0; level--) {
+             bool changed = true;
+@@ -1291,6 +1332,10 @@
+                     if (cand < 0 || cand > max_elements_)
+                         throw std::runtime_error("cand error");
+                     dist_t d = fstdistfunc_(query_data, getDataByInternalId(cand), dist_func_param_);
++#ifdef HNSWLIB_TRACE_ENABLED
++                    // EXP-10A site 2/4: upper-layer greedy neighbor distance.
++                    HNSW_TRACE_SITE(cand, level, "upper_layer_neighbor");
++#endif
+ 
+                     if (d < curdist) {
+                         curdist = d;
+--- /dev/null
++++ b/hnswlib/hnsw_trace_sink.h
+@@ -0,0 +1,53 @@
++#pragma once
++
++// ---------------------------------------------------------------------------
++// EXP-10A observation-only instrumentation interface.
++//
++// This header is included by the instrumented hnswalg.h ONLY when
++// HNSWLIB_TRACE_ENABLED is defined. It defines:
++//   - the runtime trace-sink switch and independent distance-call counter;
++//   - a DISTFUNC wrapper that delegates to the upstream function pointer
++//     (it never reimplements any vector-distance formula);
++//   - the declaration of the event emitter implemented by the probe harness.
++//
++// Scope: single index instance, single-thread query. No concurrency claim.
++// ---------------------------------------------------------------------------
++
++#include <cstdint>
++#include "hnswlib.h"
++
++// Set by the harness immediately before each searchKnn call.
++extern uint64_t g_hnsw_current_query_id;
++// Independent count of actual DISTFUNC invocations (reset before each query).
++extern uint64_t g_hnsw_dist_call_count;
++// Runtime switch: when false, the instrumented sites emit no events.
++extern bool g_hnsw_trace_sink_enabled;
++
++// Implemented in experiments/exp10a_hnswlib_probe/main.cpp.
++extern void hnsw_trace_emit(uint64_t internal_id,
++                            uint64_t external_id,
++                            int level,
++                            const char *event_site);
++
++// Per-dist_t state for the counting wrapper. One index instance is assumed.
++template <typename T>
++struct HnswTraceDistState {
++    static hnswlib::DISTFUNC<T> orig;
++    static void *orig_param;
++};
++
++template <typename T>
++hnswlib::DISTFUNC<T> HnswTraceDistState<T>::orig = nullptr;
++
++template <typename T>
++void *HnswTraceDistState<T>::orig_param = nullptr;
++
++// Drop-in DISTFUNC replacement. Increments the independent counter, then calls
++// the exact upstream distance function with the exact upstream parameters.
++// The third argument supplied by callers is ignored because dist_func_param_
++// in hnswalg.h is deliberately left UNCHANGED by the instrumentation patch.
++template <typename T>
++static T hnsw_trace_counting_distfunc(const void *a, const void *b, const void *) {
++    ++g_hnsw_dist_call_count;
++    return HnswTraceDistState<T>::orig(a, b, HnswTraceDistState<T>::orig_param);
++}
