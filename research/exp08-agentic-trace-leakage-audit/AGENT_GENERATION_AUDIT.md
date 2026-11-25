@@ -142,3 +142,88 @@ def search(search_pipeline: pt.Transformer, query: str, qid='1') -> str:
 | 源码版本 | GitHub API commits/main = `be49cce`；trees API truncated=false | API 回读 |
 
 下载源码 SHA256（临时目录 `asq_src/`，仅用于本轮核验，未入仓）：`agent.py=76a541302880`、`utils.py=7c11b6eaa5d5`、`extractor_df.py=2382ee5934c7`、`search_r1.py`（重试后下载）、`retrieval_utils.py=db6509443a35`、`load_mydataset.py=2aecaf5f4828`、`README.md=0b56620ba6d3`（均为前缀）。
+
+---
+
+# Query Privacy and Execution Boundary Audit（EXP-02-R0.2.1 Phase 1 新增）
+
+任务：EXP-02-R0.2.1 Phase 1。性质：**只读源码审计**，不运行模型、不下载权重、不调用 API、不修改 ASQ 上游。
+
+**本轮关键问题**：不能只看"检索明文有没有被写进审计日志"，必须确认**明文查询实际上有没有到达外包检索服务**。日志不记录 ≠ 服务端看不到。
+
+源码版本：从固定 commit `be49cce309efd002101610e92e733dde32533d63` 重新下载 7 个关键文件，与本地审计副本逐文件 SHA256 比对 **7/7 MATCH**（`search_r1.py=e2e17cf14f6d`、`retrieval_utils.py=db6509443a35`、`agent.py=76a541302880`、`utils.py=7c11b6eaa5d5`、`tutorial_main.py=7fb8aaeabbd5`、`load_mydataset.py=2aecaf5f4828`、`search_r1/builder.py=7709129aae0c`，前缀）。据此确认下文引用的是指定版本源码。
+
+## Q1. 查询数据流追踪（Agent → 索引执行位置）
+
+完整调用链（逐行证据）：
+
+| 环节 | 源码位置 | 事实 |
+|---|---|---|
+| Agent 生成查询 | `search_r1.py:182` `this_query = regex_extractor.get_query(...)` | 从 LLM 输出 `<search>…</search>` 抽取，是**自然语言明文字符串** |
+| 传入检索 | `search_r1.py:184` `search(self.retriever, this_query, qid="%s-%d"%(qid,cnt))` | 明文直接作为 `query` 实参传入 |
+| search() 内的调用 | `search_r1.py:45` `res = search_pipeline.search(query, qid=qid)` | PyTerrier `Transformer.search()` 便利方法，明文 query 进入检索管线 |
+| 检索器 | `retrieval_utils.py:125` `pt.terrier.Retriever(lexical_index_path, wmodel=wmodel, metadata=["docno","text"])` | **本地索引**上的 PyTerrier Terrier Retriever |
+| 索引构建 | `retrieval_utils.py:30-70` `index_lexical()` 用 `pt.terrier.IterDictIndexer(...).index(corpus_iter)` | 在本地路径 `calc_index_fpath()` = `{DATA_DIR}/index/<dataset>_bm25_index/` 建索引（第 16–27 行） |
+| 返回 docid/rank | `search_r1.py:50-59` `for doc_item in retrieval_result.itertuples(): ... doc_item.docno ...` | docid 来自本地索引结果的 `docno` 列；rank 由 PyTerrier 结果给出，extractor 用 `cumcount()+1` 落盘（`extractor_df.py:89`） |
+| 管线注入 | `tutorial_main.py:105-115` `pipeline = build_retrieval_pipeline(...)` → `agent = build_agent(args, pipeline)` | 检索器是**参数注入的本地 `pt.Transformer`** |
+
+**逐问回答（任务包 1.1）**：
+
+1. Agent 生成的 `query` 是否为自然语言明文？—— **是**（`search_r1.py:182`，`<search>` 内文本）。
+2. 明文是否直接传入 `search_pipeline.search()`？—— **是**（第 184 行 → 第 45 行，无编码/加密/令牌化中间层）。
+3. 默认 BM25/PyTerrier Retriever 是否用明文查询检索？—— **是**（`pt.terrier.Retriever` 在本地索引上执行 BM25，直接消费该字符串）。
+4. Retriever 在本地进程、客户端控制环境，还是独立远程服务？—— **本地进程内**（PyTerrier/Terrier 以 Java 索引 + Python transformer 形式在同一机器运行；`tutorial_main.py:94` `pt.java.set_memory_limit()` 显示 Java 是本地 JVM）。
+5. 是否存在真实 RPC、HTTP、网络调用边界？—— **未发现**。对全部源码做 `requests./urllib/http://socket/flask/fastapi/grpc/xmlrpc/localhost/port/serve/listen/httpx/aiohttp` 扫描，**除 import 行与注释中的项目 URL 外无任何网络边界代码**。检索调用是进程内方法调用。
+6. 哪个组件实际能看到查询明文？—— **执行检索的本地 PyTerrier/Terrier 进程**（以及 LLM 生成器、extractor）。**不存在一个"外包检索服务"观察主体**——除非实验方自行把 retriever 换成远程服务，那属于改造，非上游默认行为。
+7. 是否存在查询加密、令牌化、隐私保护 ANN 等机制？—— **不存在**。上游检索栈是纯本地 BM25（`pt.terrier.Retriever`）+ 可选本地 `ElectraScorer` 重排（`retrieval_utils.py:127`），无任何查询保护机制。
+8. docid / rank / 数量 / 轮次从哪个执行边界产生？—— 全部从**本地索引检索结果**产生：`docno` 来自 Terrier 索引（`retrieval_utils.py:125` metadata）、rank 来自结果顺序（`extractor_df.py:89`）、数量来自每次返回行数、轮次来自 Agent 生成循环 `cnt`（`search_r1.py:154,199`）。**没有跨网络边界，因此也没有"服务端视角"的这些字段**。
+
+> **关键裁定**：在 ASQ 默认配置下，"明文查询不写入审计日志"成立（extractor 只落 `llm_query` 到研究者侧 TSV），但"外包检索服务看不到明文"**不成立**——因为根本没有外包检索服务，检索在本地完成。把本地日志当作外包服务器观察是错误类比。
+
+## Q2. 三种执行模型对照表（任务包 1.2）
+
+| 模型 | 执行方式 | 查询明文可见性 | 是否符合当前核心威胁模型 |
+|---|---|---|---|
+| **A1** | Agent 与 Retriever 均在客户端/本地执行（ASQ 默认） | 外部服务端不存在或不可观察；本地检索进程可见 | **不构成外包服务端泄漏实验**。可用于验证 Agent 生成与 ACL 因果机制（对照 A 零点、后续轨迹差异），但不能冒充真实外包服务端结果 |
+| **A2** | 客户端向外包服务发送明文查询，服务端执行 BM25 | 服务端可见明文 | **不符合**查询隐私假设。此时查询语义可直接读出，问题退化为普通语义分类；只能作 `QUERY-VISIBLE DIAGNOSTIC` 诊断任务语义影响，不得写成隐私条件下泄漏 |
+| **A3** | 客户端提交受保护查询表示，外包服务执行具体隐私保护检索 | 取决于具体协议与实现 | **只有通过逐项审计后才可能符合**。不得仅凭"加密了查询"认定合格 |
+
+**ASQ 默认落点 = A1**（本地进程，无外包服务端）。ASQ 源码不提供 A2/A3 的现成后端；把它改造成 A2 只需把 retriever 换成远程 HTTP BM25（但那是**降低**隐私，不符合需求）；改造成 A3 则需要引入本任务包之外的具体隐私保护检索系统。
+
+## Q3. A3 合格条件核验（任务包 1.3）
+
+按任务包要求逐项核验是否存在"已核验、符合查询隐私要求的外包检索接口"：
+
+| 核验项 | 结论 |
+|---|---|
+| 论文或官方文档 | ASQ 仓库内**无**查询隐私保护检索方案；上游依赖是 PyTerrier 本地索引 |
+| 代码仓库及固定 commit | ASQ `be49cce` 的检索栈为 `pt.terrier.Retriever` 本地实现，无远程受保护查询接口 |
+| 客户端→服务端请求形式 | **不存在**（默认 A1，无网络请求） |
+| 服务端能否恢复明文 | 不适用（无服务端） |
+| 是否暴露可反演/可关联查询向量或令牌 | 不适用 |
+| 是否暴露查询长度/频率/重复关系 | 不适用（无服务端观测面） |
+| 是否暴露返回 ID/数量/rank/访问模式/时间 | 不适用（无服务端观测面） |
+| 是否支持连续多轮 Agent 检索 | ASQ Agent 侧支持多轮（`search_r1.py:154` 循环），但检索是本地的 |
+| 是否支持跨请求可关联 opaque docid | ASQ 本地索引用整数 docno；opaque 映射需实验方自建（见 §2.2 Int64 约束） |
+| 普通 HTTPS / 哈希查询 / 删除日志 query 字段 | **均不算查询隐私机制**（任务包明令禁止） |
+
+**结论：`NO VERIFIED QUERY-PRIVATE RETRIEVAL BACKEND`。**
+
+含义严格限定为：**当前 ASQ 实验路线不具备符合查询隐私威胁模型的检索后端**——ASQ 默认是 A1（本地，无外包服务端），不是 A3。这不等于证明整个研究问题不存在；架构 A 的间接泄漏因果关系仍是可检验假设（见 `OBSERVABILITY_AUDIT.md` §1），只是缺少一个"服务端确实只看到受保护查询 + 可见轨迹"的合规实验后端。
+
+## Q4. 对本审计其余部分的连带修正
+
+- `AGENT_GENERATION_AUDIT.md` §0 总判定"PARTIAL-FEASIBLE"维持，但须补一句：该"可行"指 **A1 本地生成机制**可行，不表示满足查询隐私威胁模型；按本表，ASQ 默认 = A1，需 A3 合规后端才能做正式外包服务实验。
+- 生成器组件（Agent 多步、extractor 记录顺序/docid）**可复用**；默认 BM25 检索器**不能直接作为查询隐私保护的外包服务**——两者必须拆开评价，不得因 Agent 部分可复用就顺带通过整个威胁模型。
+
+## Q5. 本新增章节证据索引
+
+| 结论 | 源码位置（固定 commit `be49cce`） | 核验方式 |
+|---|---|---|
+| query 为自然语言明文 | `search_r1.py:182` | 读取源码 |
+| 明文直传 search() | `search_r1.py:184` → `:45` | 读取源码 |
+| 本地索引 Retriever | `retrieval_utils.py:125,16-27,30-70` | 读取源码 |
+| 无网络/RPC 边界 | 全源码 grep（requests/urllib/socket/grpc/flask/fastapi/httpx/port 等） | 仅在 import 与注释 URL 命中 |
+| docid/rank/数量/轮次来源 | `search_r1.py:50-59`；`extractor_df.py:89`；`search_r1.py:154,199` | 读取源码 |
+| 本地 JVM（非远程服务） | `tutorial_main.py:94` `pt.java.set_memory_limit()` | 读取源码 |
+| 版本一致 7/7 SHA | 固定 commit 重新下载 vs 本地副本 | SHA256 逐文件比对 |

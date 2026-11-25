@@ -4,19 +4,23 @@
 
 ## 结论摘要
 
-**HOLD**（EXP-02-R0 / R0.1 / R0.2 一致，但理由经 R0.2 修订）。核心问题尚未被证伪，但当前没有任何单一数据集同时具备「真实 Agentic 多步检索轨迹」和「可信的授权范围 / 权限状态真值」。ASQ 有轨迹无 ACL；Permission-Aware Enterprise RAG Benchmark 有 ACL 时点真值无轨迹。两个数据集不能合法拼接。
+**HOLD**（EXP-02-R0 / R0.1 / R0.2 / R0.2.1 一致，理由逐轮修订）。核心问题尚未被证伪，但当前没有任何单一数据集同时具备「真实 Agentic 多步检索轨迹」和「可信的授权范围 / 权限状态真值」。ASQ 有轨迹无 ACL；Permission-Aware Enterprise RAG Benchmark 有 ACL 时点真值无轨迹。两个数据集不能合法拼接。
 
-**R0.2 修订要点（重要）**：独立审查指出 R0.1 初稿有一处逻辑跳步——架构 A（客户端过滤）虽无**直接**过滤结果泄漏，但存在**间接**通道：ACL 改变 Agent 上下文 → 后续自适应检索变化 → 服务端可见轨迹变化。这正是 Agentic RAG 相比单轮检索新增的泄漏面，不能因"混有任务自适应行为"就在实验前排除。混合信号应通过对照实验分离。同时，架构 C 不再是单一模型——TEE/ORAM/PIR/加密过滤可见性截然不同，未选定具体机制前不能写成"唯一成立架构"。
+**R0.2 修订要点**：独立审查指出 R0.1 初稿有一处逻辑跳步——架构 A（客户端过滤）虽无**直接**过滤结果泄漏，但存在**间接**通道：ACL 改变 Agent 上下文 → 后续自适应检索变化 → 服务端可见轨迹变化。这正是 Agentic RAG 相比单轮检索新增的泄漏面，不能因"混有任务自适应行为"就在实验前排除。架构 C 不再是单一模型——TEE/ORAM/PIR/加密过滤可见性截然不同。
+
+**R0.2.1 修订要点（本轮，重要）**：
+1. **查询隐私执行边界**：源码审计确认 ASQ 默认是 **A1 本地检索**——Agent 明文查询经 `search_pipeline.search(query, qid)` 直传本地 PyTerrier Retriever，全程无网络边界、无外包服务端观察主体。因此"日志不记录明文"不等于"服务端看不到明文"。A2 明文外包只能作 `QUERY-VISIBLE DIAGNOSTIC`；只有经核验的 A3 后端才可能符合查询隐私威胁模型，当前 `NO VERIFIED QUERY-PRIVATE RETRIEVAL BACKEND`。ASQ 的 Agent 生成器可复用，但默认 BM25 检索器**不能直接当隐私保护外包服务**。
+2. **统计独立性勘误**：148 条撤权探针实测为 **1 主体（全 u4）、1 时间点、19 目标组合、无事件关联字段**；49 条 ACL 事件仅 **21 时间戳**且含 20 条继承传播事件；u019/u044 无 golden QA。两类 estimand 分开：任务 I（跨主体推断）`NOT_EVALUABLE`，任务 II（同主体状态变化）按独立事件簇而非探针记录数。禁止 "148 probes + 32 events" 相加当样本量。
 
 修订后的核心研究问题：**在客户端执行 ACL 过滤、Agent 根据授权上下文多步自适应检索的条件下，外包检索服务能否仅凭跨调用可见轨迹推断主体的权限范围或权限状态变化？**（待检验假设，非已成立创新点。）
 
-修订后的 HOLD 理由：真正的阻塞不是"确认架构 C"，而是**必须先确定一个真实、可复核的服务端观测模型**（可为架构 A 或某个具体架构 C），并确认主体伪标识 / session 标识是否服务端可见。详见 `R0_1_DECISION.md`（已修订）与 `OBSERVABILITY_AUDIT.md` §4 字段契约。
+修订后的 HOLD 理由（三层并列阻塞）：**研究问题层**架构 A 间接泄漏待检验；**实验后端层**缺合规查询隐私后端；**统计层**跨主体与同主体两类任务分别划分且独立单位不足。详见 `R0_1_DECISION.md` §0 与 `MINIMAL_EXPERIMENT_DESIGN.md` §6–7。
 
 三问速答：
 
 1. **是否存在真正的授权推断信号？** 现有数据无法回答。ACL Benchmark 的权限真值可信，但文档 ID 命名空间与团队确定性耦合，存在无法排除的合成伪相关；必须用 opaque ID 对照。
-2. **B4 是否比 B2 多知道东西？** 本轮不能测。B3/B4 依赖「session 标识是否暴露给服务端」这一架构事实，ASQ 的 `qid` 是评测标识，不得默认服务端可见。R0.2 进一步明确：还需服务端可见的**稳定主体伪标识**才能做逐主体权限状态检测；研究者侧 `subject_id` 不得冒充服务端字段。若两者不可见，对应实验标记不可评估。
-3. **是否有合理密码学落点？** 尚不能确认。ObliSC 证明可在 TEE+ORAM 假设下获得完全遗忘，PP-RFANNS 显式接受访问模式泄露；没有证据支持现在引入新的 ZK/PIR/ORAM 贡献。
+2. **B4 是否比 B2 多知道东西？** 本轮不能测。B3/B4 依赖「session 标识是否暴露给服务端」这一架构事实，ASQ 的 `qid` 是评测标识，不得默认服务端可见；还需服务端可见的**稳定主体伪标识**才能做逐主体权限状态检测，研究者侧 `subject_id` 不得冒充服务端字段。R0.2.1 新增：即便可见，统计独立单位也不足——撤权探针仅 1 主体 / 19 目标，两类 estimand 须分开划分，不能用记录数当样本量。
+3. **是否有合理密码学落点？** 尚不能确认。ObliSC 证明可在 TEE+ORAM 假设下获得完全遗忘，PP-RFANNS 显式接受访问模式泄露；没有证据支持现在引入新的 ZK/PIR/ORAM 贡献。R0.2.1 强调：查询隐私后端（A3）缺失是实验后端层的阻塞，但不得因此先定密码学机制再找问题。
 
 ## 目录结构
 
@@ -27,10 +31,10 @@ research/exp08-agentic-trace-leakage-audit/
 ├── THREAT_MODEL.md             Phase 3：可见/不可见信息与推断目标
 ├── BASELINE_MATRIX.md          Phase 4：B0-B4 规格与公平比较约束
 ├── DECISION.md                 R0：GO/HOLD/NO-GO 与阻塞项
-├── AGENT_GENERATION_AUDIT.md   R0.1 Phase 3：ASQ 生成源码可行性核验
-├── OBSERVABILITY_AUDIT.md      R0.1 Phase 4：三种 ACL 架构的服务端可见性
-├── MINIMAL_EXPERIMENT_DESIGN.md R0.1 Phase 5：最小配对实验规格
-├── R0_1_DECISION.md            R0.1 Phase 6：本轮裁决与收敛阻塞项
+├── AGENT_GENERATION_AUDIT.md   R0.1 Phase 3：源码可行性 + R0.2.1「Query Privacy and Execution Boundary Audit」章节
+├── OBSERVABILITY_AUDIT.md      R0.1 Phase 4：三种 ACL 架构可见性 + R0.2.1 §4.3 执行模型对齐
+├── MINIMAL_EXPERIMENT_DESIGN.md R0.1 Phase 5：实验规格 + R0.2.1 §6 两类 estimand / §7 统计独立性审计
+├── R0_1_DECISION.md            R0.1 Phase 6：裁决（R0.2.1 三层状态修订）
 ├── evidence/
 │   ├── sources.md              原始来源、核验日期、状态
 │   ├── claims_and_evidence.md  结论—原始证据—核验方法—状态
