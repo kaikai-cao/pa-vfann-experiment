@@ -2,7 +2,7 @@
 
 任务：EXP-02-R0.1 Phase 5 初稿 → EXP-02-R0.2 Phase 4 修订 → EXP-02-R0.2.1 Phase 3–4 统计任务拆分与独立性审计 → EXP-02-R0.2.1a Phase 1–4 统计口径精确修订。性质：**实验规格，本轮不执行**。
 
-**修订缘由**：初稿把架构 A 定为"阴性对照"、架构 C 定为"唯一主场景"，这是逻辑跳步。R0.2 修正后，**首要检验对象是架构 A 的间接泄漏因果链**（ACL → 上下文 → 后续自适应检索 → 服务端可见轨迹变化）。R0.2.1 修正两处统计错误：(i) 把"跨主体角色推断"与"同主体权限状态变化检测"拆成两个 estimand，使用不同划分；(ii) 用原始文件实测独立统计单位，纠正"148 probes + 32 events = 样本量"的错误相加。**R0.2.1a 按独立验收意见再修三处口径**：(a) 19 个 `(user,doc,canary)` 目标键不是 19 个独立统计簇，独立簇记 `UNKNOWN`；(b) 49 事件的精确独立簇数无法从原始字段确认，记 `UNKNOWN`，只报告 4 组 reason 文本推断的继承链；(c) 区分 3 个 `move_date` 主体与 186 个具备静态 `team_id` 标签的主体，并纠正"组历史为空"的事实错误（14 组共 19 条历史，三个变化主体均有主体级记录）。本轮只改统计口径，不重审 ASQ 源码、不寻找后端、不生成轨迹。
+**修订缘由**：初稿把架构 A 定为"阴性对照"、架构 C 定为"唯一主场景"，这是逻辑跳步。R0.2 修正后，**首要检验对象是架构 A 的间接泄漏因果链**（ACL → 上下文 → 后续自适应检索 → 服务端可见轨迹变化）。R0.2.1 修正两处统计错误：(i) 把"跨主体角色推断"与"同主体权限状态变化检测"拆成两个 estimand，使用不同划分；(ii) 用原始文件实测独立统计单位，纠正"148 probes + 32 events = 样本量"的错误相加。**R0.2.1a 按独立验收意见再修三处口径**：(a) 19 个 `(user,doc,canary)` 目标键不是 19 个独立统计簇，独立簇记 `UNKNOWN`；(b) 49 事件的精确独立簇数无法从原始字段确认，记 `UNKNOWN`，只报告 4 组由 event_id 命名家族识别、reason 交叉印证的继承传播家族；(c) 区分 3 个 `move_date` 主体与 186 个具备静态 `team_id` 标签的主体，并纠正"组历史为空"的事实错误（14 组共 19 条历史，三个变化主体均有主体级记录）。本轮只改统计口径，不重审 ASQ 源码、不寻找后端、不生成轨迹。R0.2.1a.1 再补三处措辞：把继承关联依据从"仅 reason 文本"补全为"event_id 命名家族 + reason 交叉印证"；把"186/186 有 group membership 标签"限定为 membership coverage（含 all-hands 通用组）；把"Task II 独立簇严重不足"改为"独立簇 UNKNOWN + 无可确认关联/配对"（见 §7.2/§7.5 与 `R0_1_DECISION.md`）。
 
 设计前提：
 - 数据：ACL Benchmark 提供主体、ACL、时点真值；ASQ 生成流程可复用其多步记录机制但需三项改造（自定义索引/retriever、ACL 拦截、主体身份字段）——见 `AGENT_GENERATION_AUDIT.md`。
@@ -99,7 +99,7 @@
 | 不足处理 | 类别缺失或主体数量不足 → 标 `NOT_EVALUABLE`，不补造 |
 | 禁止 | 复制轨迹、重复采样、把同一主体的多个 session 当成独立主体扩充样本量 |
 
-**样本现实（R0.2.1a 修订）**：需区分两个不同口径——(i) **静态角色标签主体有 186 个**（全部有 `team_id`、9 类，且有 group membership，见 §7.5），这是任务 I 的候选样本池；(ii) 其中**角色变更主体仅 3 个**（u4/u019/u044，有 `move_date`），u019/u044 在 golden 中 0 条 QA。不得用"3 个变化主体"推导任务 I 只有 3 个可用主体。**任务 I 当前 `NOT_EVALUABLE` 的真正原因是没有任何 Agentic 轨迹**（ACL benchmark 有真值无轨迹、ASQ 有轨迹无 ACL 真值，禁止拼接），而非静态标签主体数量不足。角色变化分支（B）仍只有 3 主体且 2 无 QA，不支撑可信的跨主体角色变化泛化。
+**样本现实（R0.2.1a 修订）**：需区分两个不同口径——(i) **静态角色标签主体有 186 个**（全部有 `team_id`、9 类；组覆盖 186/186 但含 `all-hands` 通用组，非平凡组标签另计，见 §7.5），这是任务 I 的候选样本池；(ii) 其中**角色变更主体仅 3 个**（u4/u019/u044，有 `move_date`），u019/u044 在 golden 中 0 条 QA。不得用"3 个变化主体"推导任务 I 只有 3 个可用主体。**任务 I 当前 `NOT_EVALUABLE` 的真正原因是没有任何 Agentic 轨迹**（ACL benchmark 有真值无轨迹、ASQ 有轨迹无 ACL 真值，禁止拼接），而非静态标签主体数量不足。角色变化分支（B）仍只有 3 主体且 2 无 QA，不支撑可信的跨主体角色变化泛化。
 
 ### 6.2 任务 II：同主体权限状态变化检测（纵向监测）
 
@@ -117,7 +117,7 @@
 **Bootstrap 规则（任务 II）**：
 - **不得按单条 probe 重采样**。先根据原始数据中的主体、容器、ACL 事件与探针关联关系识别重复/重叠样本。
 - 以**独立 ACL 事件或更高层级的独立事件簇**为重采样单位。
-- 若多个事件共享主体或容器，必须解释如何处理相关性（本数据确有此情况：20 条继承传播事件共享 4 个 reason 文本推断的根因、4 个容器各有 2 事件、u5 出现在 10 事件、u4 出现在 11 事件）。事件表**没有结构化父事件字段**，继承关系只存于 reason 文本，精确独立事件簇数 `UNKNOWN`（§7.2）。
+- 若多个事件共享主体或容器，必须解释如何处理相关性（本数据确有此情况：20 条继承传播事件共享 4 个根因家族、4 个容器各有 2 事件、u5 出现在 10 事件、u4 出现在 11 事件）。事件表**没有专门的 `parent_event_id`/`root_event_id` 外键字段**，但 `event_id` 命名家族（根 ID 前缀）与 reason 文本 `Inherited from ...` 相互印证，可识别出 4 组继承传播关系（§7.2）。这不是外键约束，精确独立事件簇数仍 `UNKNOWN`。
 - 若最终只能得到很少的独立事件簇，必须报告统计不足，**不得用 148 条探针的记录数量或 19 个目标键数量掩盖独立样本不足**。
 
 ### 6.3 两种划分不可混用（写死）
@@ -134,13 +134,13 @@
 
 ## 7. ACL 原始数据统计独立性审计（R0.2.1 Phase 4 实测 → R0.2.1a Phase 1–4 口径修订）
 
-数据源：`$TEMP/exp02_r0_data/acl/` 下固定 revision（ACL `6e3bb8d`）原始文件：`acl_acl_matrix.json`、`acl_groups.json`、`acl_identities.json`、`eval_golden.jsonl`、`eval_acl_leak_probes.jsonl`、`world/bible.json`。两轮均**只读**，未修改脚本与 JSON 证据文件。本轮（R0.2.1a）按独立审查意见修正三处口径：(i) 19 个目标键不再冒充 19 个独立统计簇，独立簇记 `UNKNOWN`；(ii) 49 事件不再给出看似精确的独立簇数字，改报可确认依赖 + `UNKNOWN`；(iii) 区分 3 个 `move_date` 主体与 186 个具备静态角色标签的主体，并纠正"组历史为空"的事实错误。
+数据源：`$TEMP/exp02_r0_data/acl/` 下固定 revision（ACL `6e3bb8d`）原始文件：`acl_acl_matrix.json`、`acl_groups.json`、`acl_identities.json`、`eval_golden.jsonl`、`eval_acl_leak_probes.jsonl`、`world/bible.json`。两轮均**只读**，未修改脚本与 JSON 证据文件。本轮（R0.2.1a）按独立审查意见修正三处口径：(i) 19 个目标键不再冒充 19 个独立统计簇，独立簇记 `UNKNOWN`；(ii) 49 事件不再给出看似精确的独立簇数字，改报可确认依赖 + `UNKNOWN`；(iii) 区分 3 个 `move_date` 主体与 186 个具备静态角色标签的主体，并纠正"组历史为空"的事实错误。R0.2.1a.1 仅再补三处措辞（不重审数据）：继承关联依据补入 event_id 命名家族、组覆盖限定为 membership coverage（含 all-hands）、Task II 措辞从"严重不足"改为"UNKNOWN + 无可确认关联/配对"。
 
 ### 7.1 总体统计独立性表（R0.2.1a 修订）
 
 | 数据对象 | 原始记录数 | 不同主体 | 不同容器 / 目标键 | 不同时间戳 | 可确认事件关联 | 可配对 pre/post 轨迹 | 独立统计簇 | 可评估 |
 |---|---|---|---|---|---|---|---|---|
-| ACL 变更事件 | 49（event_id 49 个唯一） | 7（allow/deny_users 中出现） | 45 容器 | 21（完整 timestamp；20 个日期） | 自身即事件；无跨表关联字段 | 0（无事件前/后轨迹） | **UNKNOWN**（可确认 4 组文本推断继承链，各 5 条） | 否（无轨迹） |
+| ACL 变更事件 | 49（event_id 49 个唯一） | 7（allow/deny_users 中出现） | 45 容器 | 21（完整 timestamp；20 个日期） | 自身即事件；无跨表关联字段 | 0（无事件前/后轨迹） | **UNKNOWN**（可确认 4 组 event_id 命名家族 + reason 交叉印证的继承链，各 1 根 + 5 传播） | 否（无轨迹） |
 | post-revocation probes | 148 | **1（全 u4）** | 19 distinct target keys（16 容器前缀） | 1（2026-09-15T12:00:00Z） | **0**（无 event_id / 事件引用字段；真实对应 UNKNOWN） | **0** | **UNKNOWN**（19 只是不同目标键，非已证实独立簇） | 否（Task II `NOT_EVALUABLE`） |
 | role-change 主体 | 3（u4/u019/u044） | 3 | — | 3 个 move_date | 3 主体均有主体级组历史（u4 8 / u019 3 / u044 2 条） | 0（u4 52 条 time-travel QA 是研究者侧真值，非轨迹） | UNKNOWN | 任务 I 否；任务 II 否 |
 | 静态角色标签主体 | 186 | **186/186 有 team_id（9 类）、186/186 有组资格** | — | — | — | 0（无 Agentic 轨迹） | 待主体级划分后确认 | 任务 I 当前 `NOT_EVALUABLE`（无轨迹） |
@@ -150,18 +150,29 @@
 
 ### 7.2 49 条 ACL 事件（6.1 要求，R0.2.1a 修订）
 
-逐条读取的字段：`event_id`、`container`、`timestamp`、`reason`、`allow_users`、`deny_users`、`allow_groups`（**无** `deny_groups`、**无** `inherits_from`/`parent_event`/`root_event` 等结构化父事件字段）。
+逐条读取的字段：`event_id`、`container`、`timestamp`、`reason`、`allow_users`、`deny_users`、`allow_groups`（**无** `deny_groups`、**无专门的** `parent_event_id`/`root_event_id` 外键字段）。
 
 | 统计对象 | 数值 | 口径 |
 |---|---|---|
 | 原始记录数 | 49 | 49 个 `event_id` 全部唯一 |
 | 不同时间戳数 | **21**（完整 timestamp；按日期为 20） | ≠ 独立事件数 |
-| 不同根因 / 父事件数 | **UNKNOWN** | 事件表**没有**结构化根因字段；只能从 `reason` 文本前缀 "Inherited from …" 提取 |
-| 已识别继承传播组数 | **4 组，各 5 条 = 20 条** | 根因 token：CONF-IDN-0002 / CONF-SEC-0002 / CONF-PAY-0002 / CONF-EXEC-0002；**这是 reason 文本推断，不是结构化字段** |
+| 不同根因 / 父事件数 | **UNKNOWN** | 无专门外键字段；只能从 `event_id` 命名家族 + `reason` 文本 "Inherited from …" 两处元数据识别，均非外键约束 |
+| 已识别继承传播家族 | **4 组，每组 1 根事件 + 5 条传播 = 24 条事件记录**（传播记录 20 条） | 见下方 event_id 命名家族表；根容器 token：CONF-IDN-0002 / CONF-SEC-0002 / CONF-PAY-0002 / CONF-EXEC-0002 |
 | 其余非传播事件 | 29 条，29 个不同 reason 文本 | 无重复 reason；彼此是否共享主体/容器/策略链未确认 |
 | **精确独立事件簇数** | **UNKNOWN** | 不强行计算（见下方理由） |
 
-- **不能把 21 个时间戳当 21 个独立事件**：不同根因可能落在同一时间戳（如 2026-07-01 同时发生 u4 转 SEC、PAY deny 两组链），同一策略变更也可能跨多个时间戳体现为连续变化；除 4 组已识别继承传播外，其余事件是否共享主体/容器/策略变更链仍需判断。可确认的依赖关系仅止于"4 组文本推断继承链"，精确独立簇数标 `UNKNOWN`，不给具体数字。
+**event_id 命名家族（根 ID 前缀模式）**——继承关系不只存于 reason 文本，`event_id` 本身保留根事件 ID 前缀，`reason` 的 `Inherited from ...` 对命名模式提供交叉印证：
+
+| 根事件 ID | 继承传播子事件 ID | reason 根容器 token |
+|---|---|---|
+| `acl_chg_15` | `acl_chg_15_idn_3` … `_idn_7`（5 条） | CONF-IDN-0002 |
+| `acl_chg_13` | `acl_chg_13_sec_3` … `_sec_7`（5 条） | CONF-SEC-0002 |
+| `acl_chg_14` | `acl_chg_14_pay_3` … `_pay_7`（5 条） | CONF-PAY-0002 |
+| `acl_chg_12` | `acl_chg_12_exec_3` … `_exec_7`（5 条） | CONF-EXEC-0002 |
+
+每个家族 = 1 根事件 + 5 条继承传播记录（共 24 条事件记录，其中传播记录 20 条，后缀匹配 `_idn`/`_sec`/`_pay`/`_exec_` + `_3.._7`）。这是**命名模式 + reason 交叉印证**，不是外键约束；不得据此声称总共有某个确定数量的独立统计簇——精确独立簇数仍 `UNKNOWN`。
+
+- **不能把 21 个时间戳当 21 个独立事件**：不同根因可能落在同一时间戳（如 2026-07-01 同时发生 u4 转 SEC、PAY deny 两组链），同一策略变更也可能跨多个时间戳体现为连续变化；除 4 组由 event_id 命名家族识别、reason 交叉印证的继承传播外，其余事件是否共享主体/容器/策略变更链仍需判断。可确认的依赖关系仅止于这 4 组家族，**这不等于独立簇数=4**（其余 29 条可能有其他未识别相关，也可能彼此独立），精确独立簇数标 `UNKNOWN`，不给具体数字。
 - **容器 / 用户**：49 条事件涉及 **45 个不同容器**；用户字段（`allow_users`/`deny_users`）仅出现 **7 个用户**：u1, u2, u3, u4, u5, u6, u175。
 - **用户级 vs 组级**：22 条含 `allow_users`、13 条含 `deny_users`、48 条含 `allow_groups`（无 `deny_groups`）。绝大多数是**组级变化**（`allow_groups` 高频值：leads 20、security-cleared 20、project-aurora-tiger 11、team-identity 8、exec-staff 7…）。
 - **同一主体出现在多事件**：u4 出现在 11 条、u5 在 10 条、u6 在 8 条、u175 在 3 条、u2 在 2 条。主体间高度相关，不可当独立样本。
@@ -219,7 +230,7 @@
 |---|---|---|
 | 有明确 `move_date` 的角色变化主体 | **3**（u4/u019/u044） | 角色**变化检测**（任务 B / 任务 II）样本 |
 | 有跨主体静态角色标签的用户 | **186/186** | `world/bible.json` 每个用户有 `team_id`，9 类：data/growth/identity/mobile/payments/platform/security/sre/support-eng |
-| 有可用 group membership 标签的用户 | **186/186** | 186 个 canonical_id 全部至少出现在一个组的 `initial_members`/`members` 中 |
+| 组成员覆盖（membership coverage） | **186/186 至少出现在一个组中** | 186 个 canonical_id 全部至少出现在一个组的 `initial_members`/`members` 中；但该覆盖率包含 `all-hands` 通用组（描述 "All personnel including external contractors"，成员含全部 186 主体），**不代表 186 个主体都有非平凡、可区分的组标签**。静态角色分类以 `team_id` 为主要标签，不把通用组覆盖率当作独立的分类价值 |
 | 有真实前后角色变化配对轨迹的主体 | **0** | 无任何 Agentic 检索轨迹；u4 的 52 条 time-travel QA 是研究者侧真值 |
 | golden QA 覆盖主体 | **6**（u1/u2/u3/u4/u5/u6） | 研究者侧 QA，非服务端轨迹；u019/u044 零 QA |
 | 全体探针覆盖主体 | **5**（u1/u2/u3/u4/u176） | 其中 post-revocation 仅 u4 |
@@ -232,7 +243,7 @@
 ### 7.6 结论
 
 - 任务 I（跨主体角色推断）：**NOT_EVALUABLE**（186 主体有静态 `team_id` 标签，但 0 条 Agentic 轨迹；u019/u044 在 golden 无 QA 只影响角色变化分支，不影响静态标签覆盖面）。
-- 任务 II（同主体状态变化检测）：撤权探针独立单位严重不足（1 主体 / 1 时点 / 19 目标键 / 0 事件关联 / 0 前后轨迹；独立簇 UNKNOWN）；time-travel QA 仅 u4、2 时点真值。**当前原始文件不足以检验主要假设**；须在生成的 opaque 轨迹上按独立事件簇重新构造，并明确事件—探针关联字段与 pre/post 配对。
+- 任务 II（同主体状态变化检测）：精确独立簇数量 `UNKNOWN`；当前没有可确认的 probe–event 关联和 pre/post 轨迹配对（1 主体 / 1 时点 / 19 目标键 / 0 事件关联 / 0 前后轨迹），因此 `NOT_EVALUABLE`；time-travel QA 仅 u4、2 时点真值。**当前原始文件不足以检验主要假设**；须在生成的 opaque 轨迹上按独立事件簇重新构造，并明确事件—探针关联字段与 pre/post 配对。
 - 本审计不否定架构 A 因果假设，但表明**统计独立单位是比记录数量更硬的约束**；也不把事实性勘误（组历史非空、静态标签 186）误当成可评估性提升——可评估性的硬阻塞仍是"无轨迹 + 无事件关联"。
 
 ---
