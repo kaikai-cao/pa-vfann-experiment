@@ -1,0 +1,101 @@
+{
+  "experiment": "H1_4_PRIOR_AWARE_NEGATIVE_LEAKAGE",
+  "baseline_commit": "75fdcac1b228273ce90bac0bf229bbc6ea39b9c7",
+  "reused_inputs": {
+    "h1_2_manifest_sha256": "ab07751a608612302aa9c15a65b362a1569e71d60ce745ed0c36a9ea36f228ad",
+    "h1_2_acl_metrics_sha256": "424eecba60d5602977267adf902027d5503444b915a425fbbece1ec7f2d42b82",
+    "h1_3_manifest_sha256": "a4f94e00b889a8a4c5d220d34abd56dc4b4656b6625a7078ef7e85ad806192f7",
+    "h1_3_acl_metrics_sha256": "acb7ad734a2c5280402a1302046b907c86120625e30d6bf3929d16ca297b9848",
+    "acl_instances": 240,
+    "queries": 200,
+    "new_acl_instances": 0,
+    "attack_output_rebuilt_not_reused": true,
+    "h1_3_cross_check": "per-ACL predicted_unauthorized, unauth TP/FP and determined_fraction"
+  },
+  "environment_hashes": {
+    "vectors_sha256": "6038583a516bae0c19efaaf5047fbe4f03668834a65ae15e0c842c7750fe6d59",
+    "queries_sha256": "92423945f7320dca15db6b20959b593c6cbf0dc59dc471715d7936501daed0fc",
+    "qdist_sha256": "7f5eb28daf65db8098fca5db7a33546fb130a259a97c9cf5efd0a9209177b9ef",
+    "graph_sha256": "b2f6ecc6a53ab9131d553e3792ef319d92281ab4edb677468c0079dc7b0b3841",
+    "public_paths_sha256": "4ec122742f69de502028a9103a824ec7af18c60199fef9f5d9b71ec7aa220058",
+    "config_sha256": "85436bed1d1cdcf6ec53e4829d8c58027302e93f7f621d0f016c8c69ebe37da8"
+  },
+  "public_path_frequency": {
+    "inputs": "complete public paths only",
+    "uses_stop_positions": false,
+    "uses_acl": false,
+    "uses_result_ids": false,
+    "tie_break": "ascending node ID",
+    "order_sha256": "a46771b3ce7b3586b4a277d4e3e5e5251a9ae9f197f791f2fba80d4e7f79e113",
+    "counts_sha256": "69bb4bd7e90bb69eae3a9f77e806e7f8635b48985b43e91b130627b0ccbbd9e9"
+  },
+  "baselines": {
+    "b0_all_negative": "predict all N nodes as unauthorized",
+    "b1_matched_random": "uniform L-subset without replacement; seeded per ACL",
+    "b2_path_frequency": "top-L by public-path visit frequency",
+    "b1_analytic": "E[FP]=L*M/N; P(FP=0)=C(N-M,L)/C(N,L)"
+  },
+  "positive_class": "unauthorized",
+  "scoring": {
+    "acl_or_result_ids_to_attack": false,
+    "true_acl_scope": "independent scorer only",
+    "metrics": [
+      "TP",
+      "FP",
+      "FN",
+      "TN",
+      "precision",
+      "recall",
+      "FPR",
+      "specificity",
+      "balanced_accuracy"
+    ],
+    "ilp_or_ml": false
+  },
+  "bootstrap": {
+    "unit": "acl_instance",
+    "paired": true,
+    "replications": 5000,
+    "seed": 20261125,
+    "interval": "percentile_95",
+    "query_level_bootstrap": false
+  },
+  "pre_registered_gate": {
+    "primary_cell": "random/1%",
+    "checks": {
+      "mean_ba_gain_vs_b2_at_least_0_05": true,
+      "paired_ci_vs_b2_lower_above_0": true,
+      "mean_ba_gain_vs_b1_at_least_0_05": true,
+      "paired_ci_vs_b1_lower_above_0": true,
+      "zero_negative_label_fp": true
+    },
+    "mean_ba_gain_vs_b2": 0.2240740740740742,
+    "paired_ci_vs_b2": [
+      0.17777777777777778,
+      0.26818602693602694
+    ],
+    "mean_ba_gain_vs_b1": 0.23333333333333345,
+    "paired_ci_vs_b1": [
+      0.19090909090909092,
+      0.27424242424242423
+    ],
+    "h1_3_false_unauthorized_total": 0,
+    "decision": "CANDIDATE_NEGATIVE_MEMBERSHIP_LEAKAGE",
+    "thresholds": {
+      "mean_balanced_accuracy_gain": 0.05,
+      "paired_ci_lower_strictly_above": 0.0,
+      "bootstrap_reps": 5000,
+      "bootstrap_unit": "acl_instance"
+    }
+  },
+  "output_files": {
+    "acl_metrics.csv": {
+      "sha256": "0b73746887de9e639f79ef2a2a59811620b9a2ce652917ddbdc49ad639abce20",
+      "rows": 960
+    },
+    "summary.csv": {
+      "sha256": "ebdc8930639a8d198adcbac62addad263378b75b13dab992d06c22a80c00db8a",
+      "rows": 32
+    }
+  }
+}
