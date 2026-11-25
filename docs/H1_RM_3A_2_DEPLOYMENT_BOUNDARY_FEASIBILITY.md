@@ -10,6 +10,8 @@
 - 父提交：`c7e8189fe60a5d40a5f6aa16b8e0912e0a879e17`
 - 本分支：`research/h1-rm-3a2-deployment-boundary`
 
+> **R1 勘误说明（H1-RM.3A.2-R1）**：本文件在冻结提交 `dd6d28c2…` 基础上做一次性**证据与 trace 语义勘误**，基线分支 `research/h1-rm-3a2-deployment-boundary`、勘误分支 `research/h1-rm-3a2-r1-evidence-erratum`。修正五处、不改裁决（`CONDITIONAL` 保持）、不改任何代码/数据：①FiT 的 HNSW 中位归一化汉明距离（FiT `0.05`，Naive Bayes `0.76`，原报告写反）；②页级 trace 语义（带重复的时间序列，不是唯一页面集合）；③请求边界（FiT 网络 syscall 可提供，本地 harness 无 wrapper 是实现限制）；④增补 O2N2 v2 的 OHNSW（Doubly Oblivious HNSW）基线；⑤前置条件明确"普通 ACL 过滤轨迹变化"与"K-hit 停止额外变化"必须分离。所有改动处标 `[R1]`。
+
 **源码基准声明**：本报告 Phase 2 的行号一律指本 worktree 冻结的 `third_party/hnswlib-v0.9.0/hnswlib/hnswalg.h`（**未插桩原始版**）。前序 3A / R1 报告的行号指 `hnswlib-v0.9.0-rm2-instrumented` 插桩版，二者行号体系不同，不得直接套用同一行号。
 
 ---
@@ -21,7 +23,7 @@
 三句话理由：
 
 1. **威胁模型可映射到真实架构，故不是 STOP。** 架构 B（TEE + 不可信 OS）由 FiT（USENIX Security 2025）直接证明：HNSW 在 CCE 内运行，控制 OS 的攻击者从页访问模式重建 HNSW 节点访问序列，且能通过网络 I/O syscall 识别每个请求的起止。这满足"ACL/搜索在可信侧、外部观察读取顺序与请求结束"的基本假设。
-2. **但停止边界的增量未被证明，故不是 GO。** FiT 已从 page trace 重建 HNSW 节点访问序列，其中原则上已包含"在何处停止访问"的信息；Onyx / O2N2 这类"正确部署"用 ORAM / 双重 obliviousness 使访问模式与数据无关，停止边界被直接消除。没有任何证据表明停止边界提供**超出一般 HNSW 访问模式泄露**的授权成员信息。
+2. **但停止边界的增量未被证明，故不是 GO。** FiT 已从 page trace 重建 HNSW 节点访问序列（HNSW 中位归一化汉明距离 0.05），其中原则上已包含"在何处停止访问"的信息；Onyx / O2N2 这类"正确部署"用 ORAM / 双重 obliviousness 使访问模式与数据无关，停止边界被直接消除。特别是 **O2N2 v2 的 OHNSW 基线直接实现了固定预算（τ）的 doubly oblivious HNSW 遍历并给出形式化保证** `[R1]`。没有任何证据表明停止边界提供**超出一般 HNSW 访问模式泄露**的授权成员信息。
 3. **逻辑事件到物理事件存在粒度折叠，是必须先处理的硬约束。** R1 的 `label_read=8669` 是本地接口调用，不是 8669 次外部读取；vector / label / L0 邻接同处一个 204 B 节点块，一次块取回同时满足三类逻辑请求；`USE_SSE` 预取会在逻辑停止点之前把邻居向量拉入缓存。当前 hnswlib 源码为纯进程内指针算术，无 block 概念；把它变成"外部 SSD / 远程块存储"需重设计存储层（本阶段禁止）。
 
 ---
@@ -53,12 +55,12 @@
 | 2. 谁执行 `isIdAllowed` | 可信侧。FiT 未研究 ACL/filter（全文关键词 `filter`/`ACL` 无命中），标注 `NOT_STUDIED` | FiT 全文 PDF 检索 |
 | 3. 谁执行 `should_stop_search` | 可信侧。FiT 研究对象是 HNSW 一般搜索访问，非 ACL 触发的提前终止，标注 `NOT_STUDIED` | 同上 |
 | 4. 谁持有解密密钥 | enclave（硬件保护内存，明文仅在寄存器/cache 内） | FiT §2："Data in the protected region is also automatically encrypted and remains accessible in plaintext only within the processor registers and caches" |
-| 5. 存储观察者可见字段 | **页级访问序列**（PTE accessed bit / page fault），**不是逻辑节点**。页→对象多对一 | FiT §1："a sequence of page accesses alone cannot reveal the specific objects (i.e., embedding table entries or HNSW graph nodes) accessed, as there is a many-to-one mapping from pages to objects" |
-| 6. 查询起止可观察 | **是**。FiT 明确通过监控网络 I/O syscall 标记请求与响应来识别每个请求起止 | FiT §3："The system-level adversary can identify the start and end of each request by monitoring the network I/O syscalls that mark each request and the corresponding response" |
-| 7. 缓存/预取/批量 | 页级聚合本身即粗粒度化；同一页内多节点被折叠为一次"访问" | FiT §1 多对一论述；本实验 204 B/节点 → 约 20 节点/4 KB 页 |
-| 8. 停止位置影响外部序列 | **部分**：仅当停止使原本会访问的**新页**未被访问时才体现；若停止点所在页此前已被访问，页级 trace 不区分。当前为 `HYPOTHESIS`，未测 | 由 §2 节点布局与页粒度推算，非已证事实 |
+| 5. 存储观察者可见字段 | **页级访问时间序列**（反复清/读 PTE accessed bit 得到，含对同一页的重复访问），**不是逻辑节点**。页→对象多对一，同页内对象身份仍有歧义 | FiT §1 多对一论述；§5.1 HNSW："repeatedly checks the PTE accessed bits of this adjacency list to obtain the page access sequence x"；LLM 场景明确"capturing repeated accesses to the same page" `[R1]` |
+| 6. 查询起止可观察 | **是**。FiT 明确通过监控网络 I/O syscall 标记请求与响应来识别每个请求起止；真实 TEE 服务可由外层网络服务提供该边界 | FiT §3："The system-level adversary can identify the start and end of each request by monitoring the network I/O syscalls that mark each request and the corresponding response"；§4.2.1 `[R1]` |
+| 7. 缓存/预取/批量 | 页→对象多对一造成**身份歧义**，但页级观察是带重复的时间序列，不等同于唯一页面集合；另有 <1%（HNSW）采集误差（假阳性/假阴性） | FiT §5.5："measurement errors for up to 1% of page accesses for DLRM ... and < 1% for LLM and HNSW on both platforms"；§5.1 `[R1]` |
+| 8. 停止位置影响外部序列 | **条件可见**：停止使后续页访问序列（含重复访问）不再增长；能否与一般查询访问区分取决于"停在哪一页/该页此前访问模式"，当前为 `HYPOTHESIS`，未测。**不得默认"同页已访问即不可区分"** `[R1]` | FiT §5.1 页级序列 + §2 节点布局推算，非已证事实 |
 
-**这是三架构中唯一由原文直接证明"HNSW + 页访问可观察 + 请求边界可识别"的架构**。FiT 的实验证据：HNSW 用案的页→节点重建，攻击精度跨三个用案 71.7%–99.9%（HNSW 用案中位归一化汉明距离 0.76，见 artifact 与正文）。
+**这是三架构中唯一由原文直接证明"HNSW + 页访问可观察 + 请求边界可识别"的架构**。FiT 的实验证据：HNSW 用案的页→节点序列重建，攻击精度跨三个用案 71.7%–99.9%；**HNSW 用案的中位归一化汉明距离：FiT = 0.05，Naive Bayes 基线 = 0.76**（汉明距离越低越好；0.76 原报告误记为 FiT，本轮修正）`[R1]`。原文："FIT's efficacy on HNSW ... median normalized hamming distance of 0.05 ... Naive Bayes ... 0.77 for DLRM and 0.76 for HNSW use cases."
 
 ### 1.3 架构 C：可信客户端 + 远程存储服务器
 
@@ -154,13 +156,15 @@ data_level0_memory_    = malloc(max_elements_ * size_data_per_element_);      //
 ----------------                          ----------------------
 网络 I/O syscall: query in          ---->  标记请求起点，清 PTE accessed bits
 isIdAllowed(label(x)) -> 允许                (看不到 label、看不到判定结果)
-read_node(x) -> 向量 [同块]          ---->  页 P(x) 被 touch（PTE A bit=1）
-read_label(x) -> label [同块]        ---->  无额外页访问（同块，已 touch）
-read_neighbors(x) -> L0 邻接 [同块]  ---->  无额外页访问（同块，已 touch）
-_mm_prefetch(邻居 y 向量)            ---->  页 P(y) 可能提前 touch（预取，早于逻辑读取）
+read_node(x) -> 向量 [同块]          ---->  页 P(x) 的 A bit 置位
+read_label(x) -> label [同块]        ---->  同块，通常不产生新页事件
+read_neighbors(x) -> L0 邻接 [同块]  ---->  同块，通常不产生新页事件
+[FiT] spy 定期抢占、读 A bit、清零+TLB flush
+                                     ---->  得到带重复的页访问序列 x1,x2,...（非唯一集合）[R1]
+_mm_prefetch(邻居 y 向量)            ---->  页 P(y) 可能 touch（预取，早于逻辑读取）
 ... K 次授权命中 ...
 stop_condition::should_stop_search()        (看不到该内部事件/命中计数)
-break; 不再展开候选                  ---->  从此无新的页 touch（仅当新页未被访问过才体现）
+break; 不再展开候选                  ---->  页访问序列在此后不再增长；能否定位"停止点"取决于序列中该页的重复访问模式 [R1]
 网络 I/O syscall: query out         ---->  标记请求终点
 ```
 
@@ -171,11 +175,13 @@ break; 不再展开候选                  ---->  从此无新的页 touch（仅
 | 情况 | 外部可见内容 | 对 H1 的影响 |
 | --- | --- | --- |
 | (a) 停止点跨越到新的未访问节点块 | 请求/页访问序列提前终止于某块 | 停止位置可能可观察；仍与一般查询访问模式混杂 |
-| (b) 停止点所在块已被访问（向量/label/邻接同块，且预取已触达） | 与不停止的查询在页集合上难以区分 | 停止边界在页级**不可分辨**；这是最可能的情况 |
-| (c) 部署了缓存/批量/ORAM（架构 A 正确部署、架构 C 优化） | 访问序列被重排或填充，与数据无关 | 停止边界被**完全掩盖**，H1 信道关闭 |
-| (d) 不同查询的请求边界无法可靠划分（无 session/query handle） | 无法切分单次查询的 trace | `O(q)` 无法实例化，H1 不可评估 |
+| (b) 停止点所在块/页此前已被访问（向量/label/邻接同块，且预取已触达） | 与不停止的查询在该页的**身份**上歧义；但 FiT 页级观察是**带重复的时间序列**，后续访问次数/顺序差异仍可能携带信号 `[R1]` | 停止边界**未必不可分辨**。原报告"页已访问即不可分辨、且是最可能情况"是受限观测假设，缺少实验证据，本轮撤销该判断 `[R1]` |
+| (c) 部署了缓存/批量/ORAM（架构 A 正确部署、架构 C 优化；O2N2 的 OHNSW） | 访问序列被重排/填充为固定调度，与数据无关 | 停止边界被**完全掩盖**，H1 信道关闭 |
+| (d) 请求边界划分 | **真实 TEE 服务**：FiT 已证可由网络 I/O syscall 提供请求起止，故可切分 `[R1]`；**当前本地 hnswlib harness**：无外部 wrapper，无天然边界 | 架构 B 的根本障碍**不成立**；无边界只是本地测试框架的实现限制，不能据此判 H1 不可评估 `[R1]` |
 
-当前源码同时满足 (b) 的结构条件（204 B/节点、同块、SSE 预取）与 (d) 的条件（无 query handle 跨边界）。因此**不能**把 `requests.jsonl` 直接称作攻击者 trace；R1 的 `label_read` 数量尤其不能当作外部读取次数。
+**必须区分三件事** `[R1]`：①**页面身份歧义**——同页多节点，FiT 需靠序列相关性消歧；②**重复页面访问事件**——FiT 反复清/读 PTE accessed bit，得到的是带重复的时间序列（LLM/HNSW 场景原文明确），不是唯一页面集合；③**实际采集误差**——HNSW 用案 <1% 的假阳性/假阴性（§5.5）。因此"页已访问过就无法区分停止边界"只在"仅看唯一页面集合"的受限观测下成立，不能作为 FiT 页级攻击的默认结果。
+
+当前源码满足 (b) 的结构条件（204 B/节点、同块、SSE 预取），但 (d) 的"无边界"仅适用于本地 harness；真实部署由外层网络服务给出边界。**不能**把 `requests.jsonl` 直接称作攻击者 trace；R1 的 `label_read` 数量尤其不能当作外部读取次数。
 
 ---
 
@@ -183,20 +189,28 @@ break; 不再展开候选                  ---->  从此无新的页 touch（仅
 
 对比表（只写可核验或已标注二手的内容；禁止"首次""完全没有相关工作"等表述）：
 
-| 对比维度 | FiT (USENIX Sec'25) | Onyx (arXiv 2604.20401, 2026) | O2N2 (arXiv 2611.03415, 2026) | H1（本提案） |
+| 对比维度 | FiT (USENIX Sec'25) | Onyx (arXiv 2604.20401, 2026) | O2N2 v2 (arXiv 2611.03415v2, 2026-11-24) | H1（本提案） |
 | --- | --- | --- | --- | --- |
 | 主要保护目标 | 攻击方：从页访问重建对象访问（含 HNSW 节点） | 查询+数据库隐私，磁盘访问隐藏（single / external obliviousness） | 查询+数据库隐私，双重 obliviousness（外部+enclave 内访问均隐藏） | 提议：ACL 授权成员对外隐藏（**未证**） |
 | 观察者 | 控制 OS/Hypervisor 的云服务方 | 控制 host / SSD 访问的一方 | 外部存储 + enclave 内页/缓存侧信道方 | 假设：不可信存储/平台侧（ architectures A/B/C，未选定） |
-| 观察粒度 | **页级**（PTE accessed bits），多对一 | **块/磁盘访问**，ORAM 后与数据无关 | 访问模式被 data-independent 化 | 未定：逻辑 node（不可用）/ 页 / 块（需新后端） |
+| 观察粒度 | **页级**（PTE accessed bits，带重复的时间序列），多对一 `[R1]` | **块/磁盘访问**，ORAM 后与数据无关 | 访问模式被 data-independent 化 | 未定：逻辑 node（不可用）/ 页 / 块（需新后端） |
 | 是否处理 ACL | 否（全文无 ACL/filter） | 未研究（`NOT_STUDIED`） | 未研究（`NOT_STUDIED`） | 是（核心研究对象，未证） |
-| 是否分析停止边界 | 否（一般 HNSW 访问模式，非 ACL 触发终止） | 否（ORAM 固定调度消除 data-dependent 访问） | 否（fixed-schedule 去重/选择，访问与数据无关） | 是（核心研究问题，未证） |
+| 是否分析停止边界 | 否（一般 HNSW 访问模式，非 ACL 触发终止） | 否（ORAM 固定调度消除 data-dependent 访问） | 否（OHNSW 固定访问预算 τ + padding + 固定调度，访问与数据无关，Proposition 1 形式化证明）`[R1]` | 是（核心研究问题，未证） |
 | 是否推断授权成员 | 否 | 否 | 否 | 是（目标，未证） |
-| 底层 ANN | HNSW | DiskANN 类图索引，graph-based | 随机旋转 k-d 树森林，tree-based | HNSW v0.9.0 |
+| 底层 ANN | HNSW | DiskANN 类图索引，graph-based | 主方案随机旋转 k-d 树森林（tree-based）；**另实现 OHNSW（HNSW-based）基线** `[R1]` | HNSW v0.9.0 |
+
+**O2N2 v2 的 OHNSW 基线（本轮增补，与 H1 直接相关）** `[R1]`：原报告只介绍 k-d tree 主方案，遗漏了 v2 明确实现的 **Doubly Oblivious HNSW index (OHNSW)**。据 O2N2 v2 §VIII-A、Algorithm 4、Proposition 1：
+
+- 图结构含 entry point `s`、分层图 `G`、point storage `O`，公共度数界 `{Δ_l}`（部分数据集上层 32/底层 64，其余上层 16/底层 32）；
+- 查询从 `s` 出发，每个上层执行 **`ρ` 个固定 greedy rounds**，底层为 public beam width `w` + **fixed visit budget `τ`**；
+- 每轮处理**完整 padded neighbor list**；doubly ORAM 隐藏逻辑访问地址，固定调度与 oblivious 局部操作隐藏数据相关选择；候选选择/成员测试走固定 schedule；
+- ORAM 主导查询复杂度 `O((ρℓ+τ)·dΔ·log²N)`；**Proposition 1 明确证明 OIVF 与 OHNSW 均为 doubly oblivious**；
+- 定位：非 ACL 成员推断工作，但比 k-d tree 主方案更直接对应 H1——**固定预算 HNSW 遍历及其访问模式隐藏已有明确实现与形式化保证**。OHNSW 延迟与 Compass-in-TEE 相当且同时保护 enclave 内部访问；代码开源（anonymous.4open.science/r/O2N2-B448）。
 
 **创新性边界（诚实陈述）**：
 
 1. "ANN/HNSW 访问模式会泄露信息"**不是**本工作创新点——FiT 已对 HNSW 页访问建立攻击，Onyx/O2N2 已把访问隐藏作为设计目标。
-2. "ANN 自适应终止/oblivious 调度"**不是**本工作创新点——O2N2 用 fixed schedule、Onyx 用 ORAM，均处理 data-dependent 访问。
+2. "ANN 自适应终止/oblivious 调度"**不是**本工作创新点——O2N2 用 fixed schedule（其 **OHNSW 基线直接对 HNSW 做固定预算 τ + padding + 双重 oblivious 形式化保证**）、Onyx 用 ORAM，均处理 data-dependent 访问 `[R1]`。
 3. 三项工作中**未发现**直接研究"ACL 对外隐藏 + 过滤可信执行场景下，停止边界是否泄露授权成员"的公开工作（在本轮核查范围内）。这只能写成"核查范围内未见"，不得写成"首次"或"完全没有相关工作"。
 4. 反向风险：FiT 的页→节点重建原则上已覆盖"在何处停止访问"，H1 声称的停止边界可能是 FiT 一般访问模式攻击的一个**特例**而非独立信道。这一风险尚未排除。
 
@@ -222,15 +236,20 @@ break; 不再展开候选                  ---->  从此无新的页 touch（仅
 
 1. **固定架构**：三选一并写明理由。若选架构 A，需正面处理"正确部署用 ORAM → 停止边界关闭"的反例；若选 B，观察粒度必须是页；若选 C，须定义 HNSW 节点到 KV/块的映射与会话边界。
 2. **重建 trace 契约**：把 `O(q)` 从逻辑读取改为存储 trace（页序列或块序列），显式定义 ID 命名空间（external label 是否出现在请求中）、请求边界、批量/预取规则。
-3. **增量判据**：设计一个能把"停止边界信息"与"一般访问模式信息"分离的对照（例如匹配访问前缀但停止边界不同的查询对），否则无法证明不是 FiT 特例。
+3. **增量判据（必须做配对隔离，不能只比 C1 与 C2 的轨迹长度）** `[R1]`：源码事实——`searchBaseLayerST` 中候选先入 `candidate_set`，`isIdAllowed` 决定是否入 `top_candidates`，`lowerBound` 又依 `top_candidates` 更新（:391–432），且自定义停止条件下授权节点触发 `add_point_to_result` 改变停止条件内部状态（:409–410）。因此 **ACL 不只影响 K-hit 停止位置，还可能通过候选集与搜索界限改变普通过滤遍历控制流**。仅在同一 ACL 下比较 C1 vs C2 的轨迹长度，最多证明"增加 K-hit 会改变轨迹"，**不能**证明隐藏授权成员可被推断。必须采用如下配对：
+   - (i) 同一 query、同一索引；
+   - (ii) 两份 ACL **仅改变目标成员 `u` 的授权位**，其余完全相同；
+   - (iii) 先比较**不使用 K-hit 停止**时，普通过滤本身造成的轨迹差异（ACL 基线泄露）；
+   - (iv) 再比较**加入 K-hit 停止后**的额外轨迹差异；
+   - (v) 只有 (iv) 相对 (iii) 的增量能被单独归因于停止边界，才算建立停止边界的独立信道，否则收缩/放弃。
 4. **规模前提**：若沿用当前 N=1000 规模，须解释为何不全部放入可信内存；否则架构 A 的动因不成立。
 
 在上述条件未闭合前，**不启动 H1-RM.3B**。
 
 ### 5.4 下一阶段最小可验证实验设计建议（仅建议，本轮不执行）
 
-- 形态：**纯分析 / 离线重放**，不新增代码 backend。用冻结的 `events.jsonl` 按"页映射"重放成 page-level trace（页大小 4 KB，节点块 204 B，约 20 节点/页），比较 C0（无停止）/ C1（预算停止）/ C2（K-hit 停止）在页级序列上的差异。
-- 判据：若 C2 与 C0/C1 在页级序列上可区分，且区分度可由"停止点"而非"查询邻域本身"解释，则进入下一轮；若不可区分或差异完全由邻域解释，则收缩或放弃。
+- 形态：**纯分析 / 离线重放**，不新增代码 backend。用冻结的 `events.jsonl` 按"页映射"重放成 page-level trace（页大小 4 KB，节点块 204 B，约 20 节点/页）；页级 trace 保留**带重复的访问序列**（对齐 FiT 的观测语义），不压成唯一页面集合 `[R1]`。
+- 判据（与 §5.3 第 3 条配对隔离一致）`[R1]`：对每个 query 构造一对仅目标成员 `u` 授权位不同的 ACL；先在无 K-hit 条件下测"普通过滤"的轨迹差异 D_filter，再在有 K-hit 条件下测差异 D_stop；仅当 D_stop − D_filter 可单独归因于停止边界（而非邻域或普通过滤）时才进入下一轮。仅比较同一 ACL 下 C1/C2 的轨迹长度不足以支撑成员推断结论。
 - 边界：该重放只用于判断"是否值得做 block-level trace"，不产出成员推断结论，不复用 H1.1–H1.4 的结果表。
 
 ---
@@ -240,8 +259,8 @@ break; 不再展开候选                  ---->  从此无新的页 touch（仅
 **原文可核验（一手）**
 
 1. Onyx: Cost-Efficient Disk-Oblivious ANN Search. Rathee, Watson, Zhao, Suh, Popa. arXiv:2604.20401, v1 2026-04-22. https://arxiv.org/abs/2604.20401 — 摘要与引言（TEE + 外部 SSD、disk access pattern 泄露、ORAM 隐藏、Onyx-ANNS/Onyx-ORAM co-design）；全文 PDF 未逐段核验。
-2. Found in Translation: A Generative Language Modeling Approach to Memory Access Pattern Attacks (FiT). Jia, Wong, Khandelwal. USENIX Security 2025, pp.7957–7975. https://www.anuragkhandelwal.com/papers/fit.pdf — 全文 PDF 已下载并检索 §1/§2/§3/§4；附录 https://www.usenix.org/system/files/usenixsecurity25-appendix-jia-grace.pdf ；artifact https://zenodo.org/records/15602652 。
-3. O2N2: Efficient Doubly Oblivious Approximate Nearest Neighbor Search. Li, Guo, Zhou, Shi, Hong. arXiv:2611.03415, v1 2026-11-02. https://arxiv.org/abs/2611.03415 ; https://arxiv.org/html/2611.03415v2 — 摘要与 Table I（single vs double obliviousness、数据模型、底层 ANN）；fixed-schedule 描述来自摘要。
+2. Found in Translation: A Generative Language Modeling Approach to Memory Access Pattern Attacks (FiT). Jia, Wong, Khandelwal. USENIX Security 2025, pp.7957–7975. https://www.anuragkhandelwal.com/papers/fit.pdf — 全文 PDF 已下载并检索 §1/§2/§3/§4/§5.1/§5.4/§5.5；关键原文：HNSW 中位归一化汉明距离 FiT=0.05 vs Naive Bayes=0.76（§5.4）；"repeatedly checks the PTE accessed bits of this adjacency list to obtain the page access sequence"（§5.1）；"capturing repeated accesses to the same page"（§5.1 LLM）；网络 I/O syscall 识别请求起止（§3/§4.2.1）；测量误差 <1% for LLM and HNSW（§5.5）。附录 https://www.usenix.org/system/files/usenixsecurity25-appendix-jia-grace.pdf ；artifact https://zenodo.org/records/15602652 。`[R1]`
+3. O2N2: Efficient Doubly Oblivious Approximate Nearest Neighbor Search. Li, Guo, Zhou, Shi, Hong. **arXiv:2611.03415v2 [cs.CR], 24 Nov 2026**（v1 2026-11-02）. https://arxiv.org/abs/2611.03415 ; https://arxiv.org/html/2611.03415v2 — 摘要、Table I、§VIII-A、Algorithm 4、Proposition 1；本轮新增核查 **OHNSW（Doubly Oblivious HNSW）基线**：固定 greedy rounds ρ、public beam width w、fixed visit budget τ、padded neighbor list、doubly oblivious 形式化证明、开源代码。`[R1]`
 4. OP-TEE documentation, Secure Storage (v4.9.0). https://optee.readthedocs.io/en/4.9.0/architecture/secure_storage.html — 机密性/完整性/原子性保证；REE FS 与 RPMB 的正常世界可见字段；SSK/TSK/FEK 密钥层次；无访问模式隐藏机制。
 
 **二手来源（已标注，不作为原文事实）**
@@ -271,5 +290,17 @@ break; 不再展开候选                  ---->  从此无新的页 touch（仅
 | 反例未被忽略（ORAM 关闭信道、规模前提、FiT 特例风险） | PASS；§1.1、§5.1、§4.4 |
 | 裁决与证据一致，且不是为 GO 而放宽 | PASS；CONDITIONAL，进入 3B 需四项前置条件 |
 | 未改代码 / 未改 `StorageAccess` / 未建 backend / 未跑实验 / 未启动 3B / 未改冻结产物 / 未建 PR | PASS；本轮只新增本报告一份 |
+
+### R1 勘误自检（H1-RM.3A.2-R1）
+
+| 检查 | 结果 |
+| --- | --- |
+| Phase 0 门禁通过后才建勘误分支 | PASS；基线 HEAD `dd6d28c2`/父 `4665f165`、工作区 clean、目标分支本地与远端不存在、路径空闲、报告 blob 一致 |
+| ①FiT HNSW 指标写反已修 | PASS；FiT=0.05、Naive Bayes=0.76（原写 FiT=0.76），原文 §5.4 逐字核对，§0/§1.2/§6 同步 |
+| ②页级 trace 语义已修 | PASS；§1.2 表第 5/7/8 项、§3.2 时序图、§3.3 表 (b) 与三段式区分（身份歧义/重复访问/采集误差）；撤销"最可能不可分辨"的无证据判断 |
+| ③请求边界矛盾已修 | PASS；§1.2 与 §3.3(d) 统一：FiT 网络 syscall 提供边界；本地 harness 无 wrapper 是实现限制，非架构障碍 |
+| ④O2N2 OHNSW 基线已补 | PASS；§0、§4 对比表 + 专门小节（ρ 固定 greedy、public w、fixed τ、padding、doubly ORAM、Proposition 1）、创新性边界、§6 引用（v2 2026-11-24） |
+| ⑤配对隔离判据已补 | PASS；§5.3 第 3 条与 §5.4 明确"仅改目标成员 u 授权位 + 先测 D_filter 再测 D_stop"，引用 `candidate_set`/`lowerBound`/`add_point_to_result` 源码行号 |
+| 裁决未被改为 GO | PASS；CONDITIONAL 保持，五项修正在正文中逐处标 `[R1]` |
 
 本轮到此停止，拿到证据后再决定是否推进；不自动开始下一阶段。
