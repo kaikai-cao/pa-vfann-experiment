@@ -16,3 +16,9 @@ results/h1_rm2/trace_on/events.jsonl
 results/h1_rm_3a1/baseline/events.jsonl
 results/h1_rm_3a1/bridged/events.jsonl
 results/h1_rm_3a1/bridged/requests.jsonl
+
+# H1-RM.3A.1-R1 full raw logs (5-query small scale, regenerable). Committed
+# artifacts are verification.json, audit subsets and raw_hashes.json.
+results/h1_rm_3a1_r1/baseline/events.jsonl
+results/h1_rm_3a1_r1/bridged/events.jsonl
+results/h1_rm_3a1_r1/bridged/requests.jsonl

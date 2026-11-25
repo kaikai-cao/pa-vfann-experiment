@@ -16,11 +16,15 @@
 
 #ifdef HNSWLIB_RM2_TRACE_ENABLED
 #include "rm2_sink.h"
+// R1: event recording is a trusted-side TEST/instrumentation path, not a
+// storage request. It must NOT emit read_label requests into the request log.
+// Use the raw label reader (same bytes) so the trace stays byte-identical to
+// upstream while the search path itself goes through StorageAccess.
 #define RM2_EV(ev, iid, lvl, d, extra)                                    \
     do {                                                                   \
         if (g_rm2_enabled) {                                               \
             rm2_emit((const char *)(ev), (uint64_t)(iid),                  \
-                     (uint64_t)getExternalLabel((iid)), (int)(lvl),        \
+                     (uint64_t)getExternalLabelRaw((iid)), (int)(lvl),     \
                      (float)(d), (int64_t)(extra));                        \
         }                                                                  \
     } while (0)
@@ -213,10 +217,34 @@ class HierarchicalNSW : public AlgorithmInterface<dist_t> {
     }
 
 
-    inline labeltype getExternalLabel(tableint internal_id) const {
+    // Raw label read: retained for non-query paths (RM2 event recording,
+    // loadIndex, replacePoint) so those paths never enter the request trace.
+    // It reads the identical bytes as the bridged query-time path.
+    inline labeltype getExternalLabelRaw(tableint internal_id) const {
         labeltype return_label;
         memcpy(&return_label, (data_level0_memory_ + internal_id * size_data_per_element_ + label_offset_), sizeof(labeltype));
         return return_label;
+    }
+
+    // R1: query-time label read. When a StorageAccess boundary is attached,
+    // obtain the full node-block view through read_label() and parse the
+    // label from the view with an explicit bounds check. With no boundary
+    // (baseline / bridge=0 / build time) fall back to the raw read so the
+    // frozen baseline semantics are byte-for-byte unchanged.
+    inline labeltype getExternalLabel(tableint internal_id) const {
+#ifdef HNSWLIB_RM31_BRIDGE
+        if (storage_access_) {
+            hnsw_bridge::NodeView view =
+                storage_access_->read_label(static_cast<uint64_t>(internal_id));
+            if (!view.covers(label_offset_, sizeof(labeltype))) {
+                throw std::runtime_error("label read outside node block view");
+            }
+            labeltype return_label;
+            memcpy(&return_label, view.base + label_offset_, sizeof(labeltype));
+            return return_label;
+        }
+#endif
+        return getExternalLabelRaw(internal_id);
     }
 
 
@@ -233,7 +261,14 @@ class HierarchicalNSW : public AlgorithmInterface<dist_t> {
     inline char *getDataByInternalId(tableint internal_id) const {
 #ifdef HNSWLIB_RM31_BRIDGE
         if (storage_access_) {
-            return storage_access_->read_node(static_cast<uint64_t>(internal_id));
+            hnsw_bridge::NodeView view =
+                storage_access_->read_node(static_cast<uint64_t>(internal_id));
+            if (!view.covers(offsetData_, data_size_)) {
+                throw std::runtime_error("vector read outside node block view");
+            }
+            // Distance functions read only; build-time writes happen before a
+            // boundary is attached and therefore use the raw branch below.
+            return const_cast<char *>(view.base + offsetData_);
         }
 #endif
         return (data_level0_memory_ + internal_id * size_data_per_element_ + offsetData_);

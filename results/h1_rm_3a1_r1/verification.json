@@ -1,0 +1,76 @@
+{
+  "config": {
+    "queries": 5,
+    "groups": [
+      "C0",
+      "C1",
+      "C2"
+    ],
+    "note": "first 5 queries of the frozen fixed config"
+  },
+  "byte_identity": {
+    "events.jsonl": {
+      "baseline_sha256": "a4bfb447a7a3933f8b1feeba402041d508cd77d45e13cf4a3b02273624e64d87",
+      "bridged_sha256": "a4bfb447a7a3933f8b1feeba402041d508cd77d45e13cf4a3b02273624e64d87",
+      "identical": true
+    },
+    "topk.jsonl": {
+      "baseline_sha256": "60c04c7d7ee149351aa8a466cb412e9dff035c2a5c3fbeed4041dab36c7d74e6",
+      "bridged_sha256": "60c04c7d7ee149351aa8a466cb412e9dff035c2a5c3fbeed4041dab36c7d74e6",
+      "identical": true
+    },
+    "run_summary.jsonl": {
+      "baseline_sha256": "064dbdfc2b375b3a92efd4f0f888984bb3fa69e4ef4087fca6bd348f03aa71df",
+      "bridged_sha256": "064dbdfc2b375b3a92efd4f0f888984bb3fa69e4ef4087fca6bd348f03aa71df",
+      "identical": true
+    }
+  },
+  "request_trace": {
+    "total_requests": 34142,
+    "units": 15,
+    "by_type": {
+      "boundary": 30,
+      "node_read": 10914,
+      "neighbor_read": 14529,
+      "label_read": 8669
+    },
+    "by_group": {
+      "C0": {
+        "boundary": 10,
+        "node_read": 5103,
+        "neighbor_read": 6977,
+        "label_read": 3850
+      },
+      "C1": {
+        "boundary": 10,
+        "node_read": 5164,
+        "neighbor_read": 6977,
+        "label_read": 4242
+      },
+      "C2": {
+        "boundary": 10,
+        "node_read": 647,
+        "neighbor_read": 575,
+        "label_read": 577
+      }
+    },
+    "seq_strictly_increasing": true,
+    "seq_violations": [],
+    "boundary_matched": true,
+    "boundary_mismatch": [],
+    "label_read_subset_of_node_read": true,
+    "label_ids_not_in_node_read": [],
+    "label_read_per_unit_min": 77,
+    "label_read_per_unit_max": 890,
+    "node_read_per_unit_min": 81,
+    "node_read_per_unit_max": 1041
+  },
+  "gate": {
+    "semantic_identity": true,
+    "label_read_present": true,
+    "seq_ok": true,
+    "boundary_ok": true,
+    "label_subset_ok": true,
+    "overall": true
+  }
+}

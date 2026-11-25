@@ -98,6 +98,7 @@ static const char *request_type_name(hnsw_bridge::RequestType t) {
         case hnsw_bridge::RequestType::node_read: return "node_read";
         case hnsw_bridge::RequestType::neighbor_read: return "neighbor_read";
         case hnsw_bridge::RequestType::boundary: return "boundary";
+        case hnsw_bridge::RequestType::label_read: return "label_read";
         default: return "unknown";
     }
 }
@@ -287,12 +288,16 @@ static bool open_of(std::ofstream &out, const std::string &path) {
 
 int main(int argc, char **argv) {
     if (argc < 4) {
-        std::cerr << "usage: h1rm31_bridge <outdir> <trace:0|1> <bridge:0|1>\n";
+        std::cerr << "usage: h1rm31_bridge <outdir> <trace:0|1> <bridge:0|1> [nqueries]\n";
         return 2;
     }
     const std::string outdir = argv[1];
     const bool trace = (std::string(argv[2]) == "1");
     const bool use_bridge = (std::string(argv[3]) == "1");
+    // Optional 4th arg: run only the first n queries (R1 small-scale check).
+    // Default is the full fixed 50-query set; data, index, ACL and RNG are
+    // unchanged, so the first n queries are identical to the frozen run.
+    const size_t nq = (argc >= 5) ? std::min<size_t>(NQ, std::stoul(argv[4])) : NQ;
 
     std::vector<float> base(N * DIM), queries(NQ * DIM);
     {
@@ -332,7 +337,7 @@ int main(int argc, char **argv) {
     }
 #endif
 
-    for (size_t q = 0; q < NQ; ++q) {
+    for (size_t q = 0; q < nq; ++q) {
         const float *qv = queries.data() + q * DIM;
         g_rm2_current_query_id = static_cast<uint64_t>(q);
 
@@ -469,9 +474,9 @@ int main(int argc, char **argv) {
     for (size_t i = 0; i < N; ++i) {
         if (authorized(static_cast<labeltype>(LABEL_BASE + LABEL_STEP * i))) ++authorized_nodes;
     }
-    std::cout << "mode=H1-RM.3A.1 trace=" << trace
+    std::cout << "mode=H1-RM.3A.1-R1 trace=" << trace
               << " bridge=" << (use_bridge ? 1 : 0)
-              << " queries=" << NQ
+              << " queries=" << nq
               << " authorized_nodes=" << authorized_nodes
               << " outdir=" << outdir << "\n";
     return 0;

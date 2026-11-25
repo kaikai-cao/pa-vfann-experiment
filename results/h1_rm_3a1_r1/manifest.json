@@ -1,0 +1,46 @@
+{
+  "task": "H1-RM.3A.1-R1 External Label Read Boundary Closure",
+  "parent_commit": "c7e8189fe60a5d40a5f6aa16b8e0912e0a879e17",
+  "small_scale": {
+    "queries": 5,
+    "groups": [
+      "C0",
+      "C1",
+      "C2"
+    ]
+  },
+  "config": "identical to frozen EXP-10A/H1-RM.3A.1 (N=1000, dim=16, IP, M=16, efC=200, efS=64, k=10, seed=2026, label=100000+17*i)",
+  "committed_files": [
+    "docs/H1_RM_3A_1_R1_EXTERNAL_LABEL_READ_BOUNDARY.md",
+    "experiments/h1_rm_3a1_storage_bridge/storage_access.h",
+    "experiments/h1_rm_3a1_storage_bridge/hnswlib_bridge/hnswalg.h",
+    "experiments/h1_rm_3a1_storage_bridge/main.cpp",
+    "experiments/h1_rm_3a1_storage_bridge/verify_r1.py",
+    "experiments/h1_rm_3a1_storage_bridge/make_r1_artifacts.py",
+    "results/h1_rm_3a1_r1/verification.json",
+    "results/h1_rm_3a1_r1/events_audit.jsonl",
+    "results/h1_rm_3a1_r1/requests_audit.jsonl",
+    "results/h1_rm_3a1_r1/raw_hashes.json",
+    "results/h1_rm_3a1_r1/baseline/topk.jsonl",
+    "results/h1_rm_3a1_r1/baseline/run_summary.jsonl",
+    "results/h1_rm_3a1_r1/baseline/requests.jsonl",
+    "results/h1_rm_3a1_r1/bridged/topk.jsonl",
+    "results/h1_rm_3a1_r1/bridged/run_summary.jsonl",
+    "results/h1_rm_3a1_r1/manifest.json"
+  ],
+  "raw_logs_gitignored": [
+    "results/h1_rm_3a1_r1/baseline/events.jsonl",
+    "results/h1_rm_3a1_r1/bridged/events.jsonl",
+    "results/h1_rm_3a1_r1/bridged/requests.jsonl"
+  ],
+  "raw_hashes": {
+    "baseline_events.jsonl_sha256": "a4bfb447a7a3933f8b1feeba402041d508cd77d45e13cf4a3b02273624e64d87",
+    "baseline_topk.jsonl_sha256": "60c04c7d7ee149351aa8a466cb412e9dff035c2a5c3fbeed4041dab36c7d74e6",
+    "baseline_run_summary.jsonl_sha256": "064dbdfc2b375b3a92efd4f0f888984bb3fa69e4ef4087fca6bd348f03aa71df",
+    "baseline_requests.jsonl_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bridged_events.jsonl_sha256": "a4bfb447a7a3933f8b1feeba402041d508cd77d45e13cf4a3b02273624e64d87",
+    "bridged_topk.jsonl_sha256": "60c04c7d7ee149351aa8a466cb412e9dff035c2a5c3fbeed4041dab36c7d74e6",
+    "bridged_run_summary.jsonl_sha256": "064dbdfc2b375b3a92efd4f0f888984bb3fa69e4ef4087fca6bd348f03aa71df",
+    "bridged_requests.jsonl_sha256": "e7ea831a59b259ed918ea4d0d85cc338bc89d011171db53b066793cad45ba449"
+  }
+}
