@@ -5,6 +5,8 @@
 - 生成时 HEAD：`69c4bd05e48f8734bc46e290ecb726320c572b45`
 - 本轮只修正计算与指标，不重跑 embedding、HNSW、查询轨迹，不扩展研究问题。
 
+> **EXP-10B.2-R1 语义勘误（文档级，冻结轮次）**：本文件已在分支 `exp10-fiqa-semantic-erratum` 上，对 `clustered_3center_farthest_first` 的构造语义与结论措辞做有限勘误。全部数值、CSV、mask、manifest、trace、Ground Truth、统计脚本与原始输入 SHA-256 均未改动；机器可读名称 `clustered_3center_farthest_first` 保持不变。勘误的事实依据与范围见 `docs/EXP10B2_SEMANTIC_ERRATUM.md`。
+
 ## A. 原始数据与 trace 的可靠性
 
 - 数据门仍是 `PASS_COMPONENT_ARTIFACTS`；原 UKP ZIP MD5 仍为 `NOT_VERIFIED`，历史报告未覆盖。
@@ -141,7 +143,21 @@ nDCG@10 只作为辅助指标，与 exact vector Recall@10 分开解释。修正
 
 方向性观察：selectivity 排序（30% > 10% > 1%）与 random 高于 clustered 一致于 exact Recall；但 prefix 增益很小，说明稀疏 qrels 与候选覆盖限制使 nDCG@10 对 prefix 不敏感，不能替代 exact vector Recall。
 
-## D. 新三中心 mask 变体
+## D. 三中心 mask 变体：farthest-first cluster-prefix authorization
+
+机器可读名称 `clustered_3center_farthest_first` 保持不变。其**实际构造语义**是：在归一化 embedding 空间用 farthest-first 选出三个中心并把每个 corpus 文档分配给最近中心，然后按中心选择顺序排列 cluster，**从第一个 cluster 开始整簇取文档，当前 cluster 不足时才进入下一个 cluster，达到目标授权数即停止**。因此分析文字中更准确的描述是 **farthest-first cluster-prefix authorization（三中心划分 + 按中心顺序截取簇前缀）**；它**不是**三个中心对应区域的均衡混合，也**不是**每个中心都贡献文档的授权集合。
+
+构造细节（与 `experiments/exp10_fiqa_hnswlib/rebuild_cluster_masks.py` 和 `results/exp10b2/cluster_mask_manifest.json` 一致）：初始中心为 `default_rng(seed).choice(N)`；后续中心按到已选中心的最小平方欧氏距离最大值选取，同距离取最小 corpus 行号；分配用归一化向量最大 dot product，同分取选择顺序靠前的中心；簇内不足时按到中心平方距离升序、再按 corpus 行号升序取；目标数 `K=ceil(rho*N)`；不使用任何 query 内容。
+
+**全部 seed × selectivity 的 cluster 覆盖核验**（数据取自 manifest 的 `cluster_sizes` 与 `partial_details`，非任务包示例复制）：
+
+| seed | cluster_sizes（按选择顺序） | 1% K=577 | 10% K=5764 | 30% K=17292 |
+|---:|---|---|---|---|
+| 2026 | [22150, 26572, 8916] | 仅簇 0（取 577） | 仅簇 0（取 5764） | 仅簇 0（取 17292） |
+| 2027 | [30389, 16011, 11238] | 仅簇 0（取 577） | 仅簇 0（取 5764） | 仅簇 0（取 17292） |
+| 2028 | [10789, 36094, 10755] | 仅簇 0（取 577） | 仅簇 0（取 5764） | 簇 0 全取 10789 + 簇 1 取 6503 |
+
+即：9 个 mask 中 8 个授权集合完全落在第一个 cluster 内；仅 seed=2028、30% 档跨入第二个 cluster。注意 manifest 的 `partial_details` 只记录"被部分截取"的簇，整簇纳入的簇 0 不出现在其中，故 `partial_details` 的 `[1]` 不表示"仅来自簇 1"，应结合 `cluster_sizes` 与 K 判读。
 
 | p | ceil(K) | 旧 random cardinality | 新 cluster3 cardinality | 配对状态 |
 |---:|---:|---:|---:|---|
@@ -163,22 +179,41 @@ nDCG@10 只作为辅助指标，与 exact vector Recall@10 分开解释。修正
 
 ## E. 仍然无法支持的主张
 
+本轮所有数值结论**仅适用于**：FiQA test queries + `sentence-transformers/all-MiniLM-L6-v2`（固定 revision `1110a243...`）+ hnswlib v0.9.0 + 当前 HNSW 参数（M=32、efConstruction=200、efSearch∈{64,128,256}、k=10、seed=2026、单线程）+ 当前合成授权 mask 构造 + HNSW query distance-evaluation trace 口径。三中心变体的结论进一步局限于上文所述的 farthest-first cluster-prefix 首簇局部授权子集。
+
 - 不声称已证明完整访问模式隐私。
 - 不声称已证明在线无损 stopping rule；Oracle 是事后上界。
 - 不声称已证明真实企业 ACL 下的安全性；授权 mask 是合成的。
 - 不声称已解决 Agent/RAG 授权检索问题。
 - 不声称已证明 PA-VFANN 普遍优于现有方法。
+- 不声称已证明所有 ANN 系统都存在相同问题，或三中心/多区域授权分布普遍具有同样的 1% 困难现象。
 
 ## 对七个问题的回答
 
 1. **修正 NOT_REACHED 后，Oracle prefix 空间是否仍然存在？** 是，但只作为事后空间：例如 ef=128、旧 clustered、10%、δ=0.10 的 reached-only mean t*/B=0.6443（95% CI [0.6403, 0.6484]）。本数据所有样本均 reached，因此不存在被 B/1.0 误填的样本。
 2. **哪些 selectivity 下 reached rate 明显下降？** 没有：三个 mask 类型、三个 selectivity、两个 δ、三个 efSearch 的 reached rate 全部为 1.000。1% 的困难体现在 full-trace Recall 更低，而不是 Oracle 不可达。
-3. **random 与两种 clustered 分布的差异有多大？** C.2 给出非配对聚合均值，C.3 给出严格配对差值；新三中心 mask 在 cardinality 不匹配档位不给配对因果解释。
+3. **random 与两种 clustered 授权构造的差异有多大？** C.2 给出非配对聚合均值，C.3 给出严格配对差值；三中心变体在 cardinality 不匹配档位不给配对因果解释。这里比较的是三种**合成授权 mask 构造**，不是三种均衡的多区域授权分布；其中 `clustered_3center_farthest_first` 在当前实现下是首簇为主的 cluster-prefix 子集。
 4. **修正后的 bootstrap 是否支持稳定差异？** 以 C.3 的 query-level cluster bootstrap 95% CI 为准；仅跨 0 与否不足以达到因果主张。
 5. **修正 nDCG 后，质量趋势是否与 exact vector Recall 一致？** 方向上一致（30% > 10% > 1%，random > clustered），但 nDCG@10 随 prefix 几乎不增长；qrels 稀疏且 IDCG 基于全部授权相关文档，因此 nDCG 是辅助指标，不能替代 exact vector Recall。
-6. **新三中心 mask 是否复现 1% 授权困难现象？** 是：1% 档 prefix Recall@10（B）为 ef64=0.3783、ef128=0.4981、ef256=0.6336，明显低于 10% 档（0.8162/0.9032/0.9570）和 30% 档（0.9554/0.9851/0.9958）。
+6. **三中心变体在 1% 授权率下的困难现象如何表述？** 更准确的说法是：**在当前 farthest-first cluster-prefix 构造下，首簇局部授权子集在 1% 授权率下仍出现明显 full-trace Recall 损失**——1% 档 prefix Recall@10（B）为 ef64=0.3783、ef128=0.4981、ef256=0.6336，明显低于 10% 档（0.8162/0.9032/0.9570）和 30% 档（0.9554/0.9851/0.9958）。这是**当前构造下的局部授权分布观察**：9 个 mask 中 8 个授权集合完全落在第一个 cluster 内，因此不能表述为"三个 cluster 均衡参与"，也不能据此证明"一般意义上的三中心或多区域授权分布"具有同样现象。
 7. **哪些结论只适用于当前 FiQA + MiniLM + hnswlib 配置？** 本文全部数值结论都只适用于该配置、固定 revision 的组件、合成授权 mask 与有序距离计算 trace；不外推到真实 ACL、其他模型/索引或其他硬件/实现。
 
 ## 交付与停止
 
 本轮完成 EXP-10B.2 后立即停止；不启动 EXP-11，不新增数据集，不尝试新的 stopping rule，不引入新的密码学原语，不包装成 Agent/RAG 实现。是否继续投入 PA-VFANN 由用户与研究助手共同判断。
+
+## EXP-10B.2-R1 语义勘误与冻结记录
+
+本轮为**有限文档勘误**：只修正 `clustered_3center_farthest_first` 的构造语义解释、结论措辞与限制说明。没有重新生成 embedding、mask、HNSW index、query trace、Ground Truth 或统计结果；原始 trace、CSV、mask manifest、统计脚本与原始输入 SHA-256 清单（39 项）全部复核一致。勘误依据见 `docs/EXP10B2_SEMANTIC_ERRATUM.md`。
+
+EXP-10 各阶段状态：
+
+- EXP-10A：trace feasibility 完成（hnswlib v0.9.0 有序距离计算轨迹，V1–V5 PASS）。
+- EXP-10B：FiQA 外部有效性实验完成（原 ZIP 通道阻断 → BEIR 一手组件 revision-pinned 恢复）。
+- EXP-10B.1：数据源修订完成（数据门 `PASS_COMPONENT_ARTIFACTS`，原 ZIP MD5 仍 `NOT_VERIFIED`）。
+- EXP-10B.2：统计与指标修正完成（Oracle / bootstrap / nDCG / clustered mask）。
+- EXP-10B.2-R1：三中心授权分布语义勘误完成（本轮，仅文档）。
+
+本轮之后 EXP-10 冻结：不启动 EXP-11、不增加新数据集、不重跑 HNSW、不追加统计审计。后续如需新实验，必须先提出独立、明确的研究假设与贡献目标。
+
+**EXP-10 STATUS: FROZEN**
