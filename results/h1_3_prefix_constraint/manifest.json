@@ -1,0 +1,114 @@
+{
+  "experiment": "H1_3_PREFIX_CONSTRAINT_INFERENCE",
+  "baseline_commit": "b60447ec8b78a4d208261d301978df35357acc82",
+  "h1_2_baseline_commit": "2703472fe8c846c2ac91eb397babfe41d74483ef",
+  "reused_h1_2": {
+    "acl_metrics_sha256": "424eecba60d5602977267adf902027d5503444b915a425fbbece1ec7f2d42b82",
+    "manifest_sha256": "ab07751a608612302aa9c15a65b362a1569e71d60ce745ed0c36a9ea36f228ad",
+    "acl_instances": 240,
+    "queries": 200,
+    "new_acl_instances": 0
+  },
+  "environment_hashes": {
+    "vectors_sha256": "6038583a516bae0c19efaaf5047fbe4f03668834a65ae15e0c842c7750fe6d59",
+    "queries_sha256": "92423945f7320dca15db6b20959b593c6cbf0dc59dc471715d7936501daed0fc",
+    "qdist_sha256": "7f5eb28daf65db8098fca5db7a33546fb130a259a97c9cf5efd0a9209177b9ef",
+    "graph_sha256": "b2f6ecc6a53ab9131d553e3792ef319d92281ab4edb677468c0079dc7b0b3841",
+    "public_paths_sha256": "4ec122742f69de502028a9103a824ec7af18c60199fef9f5d9b71ec7aa220058",
+    "config_sha256": "85436bed1d1cdcf6ec53e4829d8c58027302e93f7f621d0f016c8c69ebe37da8"
+  },
+  "attack": {
+    "inputs": "public paths, stop positions, E1 parameters; optional aggregate M",
+    "acl_or_result_ids_to_attack": false,
+    "method": "deterministic prefix bound propagation",
+    "ilp_or_ml": false,
+    "variants": [
+      "terminal_only",
+      "prefix_no_size",
+      "prefix_with_size"
+    ]
+  },
+  "pre_registered_gate": {
+    "substantial_gain_reached": false,
+    "decision": "STOP_NO_ESCALATION",
+    "winner_cells": [],
+    "thresholds": {
+      "mean_new_authorized_nodes": 5,
+      "new_authorized_acl_fraction": 0.5,
+      "mean_relative_recall_gain": 0.1
+    }
+  },
+  "secondary_label_determination": {
+    "cells": [
+      {
+        "policy_type": "random",
+        "selectivity_pct": 1,
+        "determined_fraction_gain": 0.4476866666666666,
+        "mean_new_unauthorized_nodes": 4476.866666666667,
+        "mean_unauth_precision": 1.0
+      },
+      {
+        "policy_type": "random",
+        "selectivity_pct": 5,
+        "determined_fraction_gain": 0.033539999999999986,
+        "mean_new_unauthorized_nodes": 335.4,
+        "mean_unauth_precision": 1.0
+      },
+      {
+        "policy_type": "random",
+        "selectivity_pct": 10,
+        "determined_fraction_gain": 0.0012899999999999995,
+        "mean_new_unauthorized_nodes": 12.9,
+        "mean_unauth_precision": 1.0
+      },
+      {
+        "policy_type": "random",
+        "selectivity_pct": 30,
+        "determined_fraction_gain": 0.0,
+        "mean_new_unauthorized_nodes": 0.0,
+        "mean_unauth_precision": null
+      },
+      {
+        "policy_type": "clustered",
+        "selectivity_pct": 1,
+        "determined_fraction_gain": 0.4993999999999999,
+        "mean_new_unauthorized_nodes": 4994.0,
+        "mean_unauth_precision": 1.0
+      },
+      {
+        "policy_type": "clustered",
+        "selectivity_pct": 5,
+        "determined_fraction_gain": 0.028306666666666667,
+        "mean_new_unauthorized_nodes": 283.06666666666666,
+        "mean_unauth_precision": 1.0
+      },
+      {
+        "policy_type": "clustered",
+        "selectivity_pct": 10,
+        "determined_fraction_gain": 0.0008133333333333343,
+        "mean_new_unauthorized_nodes": 8.133333333333333,
+        "mean_unauth_precision": 1.0
+      },
+      {
+        "policy_type": "clustered",
+        "selectivity_pct": 30,
+        "determined_fraction_gain": 0.0,
+        "mean_new_unauthorized_nodes": 0.0,
+        "mean_unauth_precision": null
+      }
+    ],
+    "max_determined_fraction_gain": 0.4993999999999999,
+    "in_escalation_gate": false,
+    "interpretation": "Extra determined labels are unauthorized (negative) labels; this is not counted as recovering additional authorized members."
+  },
+  "output_files": {
+    "acl_metrics.csv": {
+      "sha256": "acb7ad734a2c5280402a1302046b907c86120625e30d6bf3929d16ca297b9848",
+      "rows": 720
+    },
+    "summary.csv": {
+      "sha256": "a2e7002f49393a5e67e6d3828bb45b3825c6014ba619705aaa568a2f185e169b",
+      "rows": 24
+    }
+  }
+}
