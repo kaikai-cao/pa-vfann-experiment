@@ -1,7 +1,9 @@
-"""H1-RM.3A.4 — Secret ACL fixture & pair integrity tests.
+"""H1-RM.3A.4 / 3A.5 — Secret ACL fixture, pair integrity and filter adapter tests.
 
-Independent data-layer verification. No HNSW query, no C0/C1/C2, no attack
-evaluation, no real ACL instance, and no secret material written to logs.
+Independent data-layer and callback-contract verification: no HNSW query, no
+C0/C1/C2, no attack evaluation, no real ACL instance, and no secret material
+written to logs. The 3A.5 tests call the filter functor directly; they do NOT
+run HNSW search.
 
 Run:
     python -m pytest tests/test_h1_rm3a4_secret_acl.py -v
@@ -262,3 +264,133 @@ def test_no_secret_material_in_logs(capsys, tmp_path, cpp_driver):
     # Count field is member count (40), NOT the authorized count.
     assert int.from_bytes(blob[8:16], "little") == len(FIXED_VEC) == 40
     assert sum(FIXED_VEC) != 40  # ensure the two are distinguishable in this vector
+
+
+# --------------------------------------------------------------------------- #
+# 11. Phase A — empty bitmap contract is N > 0 in BOTH languages
+# --------------------------------------------------------------------------- #
+def test_empty_bitmap_encode_rejected():
+    # C++ AclBitmap::load() rejects count == 0; Python encode must agree.
+    with pytest.raises(ValueError):
+        ab.encode_acl_bitmap([])
+    # Zero TARGETS is still legal; it is a different quantity from zero MEMBERS.
+    assert ab.select_targets(10, 0, PUBLIC_SEED) == []
+
+
+def test_header_only_zero_count_rejected_by_both_languages(tmp_path, cpp_driver):
+    header_only = ab.MAGIC + (0).to_bytes(ab.COUNT_LEN, "little", signed=False)
+    with pytest.raises(ValueError):
+        ab.decode_acl_bitmap(header_only)
+    p = tmp_path / "zero_count.bin"
+    p.write_bytes(header_only)
+    proc = run_cpp(cpp_driver, p)
+    assert proc.returncode == 1
+    assert "LOAD BAD_MEMBER_COUNT" in proc.stdout
+
+
+# --------------------------------------------------------------------------- #
+# 12. Phase C — filter adapter compiles against BOTH frozen hnswlib header sets
+# --------------------------------------------------------------------------- #
+HNSW_INCLUDE_DIRS = {
+    "pristine": REPO_ROOT / "third_party" / "hnswlib-v0.9.0" / "hnswlib",
+    "rm2": REPO_ROOT / "third_party" / "hnswlib-v0.9.0-rm2-instrumented" / "hnswlib",
+}
+
+
+@pytest.fixture(scope="module")
+def filter_drivers(tmp_path_factory):
+    compiler = shutil.which("g++") or shutil.which("clang++")
+    if compiler is None:
+        pytest.fail(
+            "ENVIRONMENT BLOCK: no C++ compiler (g++/clang++). "
+            "Adapter compile acceptance CANNOT be skipped while claiming PASS."
+        )
+    build = tmp_path_factory.mktemp("h1acl_filter")
+    src = MODULE_DIR / "test_hnsw_acl_filter.cpp"
+    drivers = {}
+    for name, include_dir in HNSW_INCLUDE_DIRS.items():
+        if not (include_dir / "hnswlib.h").is_file():
+            pytest.fail(f"frozen hnswlib header missing: {include_dir}")
+        exe = build / (
+            f"filter_{name}.exe" if sys.platform == "win32" else f"filter_{name}"
+        )
+        proc = subprocess.run(
+            [compiler, "-std=c++17", "-Wall", "-Wextra", "-O0",
+             f"-I{MODULE_DIR}", f"-I{include_dir}", str(src), "-o", str(exe)],
+            capture_output=True, text=True,
+        )
+        if proc.returncode != 0:
+            pytest.fail(
+                f"C++ adapter compile failed ({name}):\n{proc.stdout}\n{proc.stderr}"
+            )
+        drivers[name] = exe
+    return drivers
+
+
+def run_filter(exe, *args):
+    return subprocess.run(
+        [str(exe), *(str(x) for x in args)], capture_output=True, text=True
+    )
+
+
+def parse_filter_output(text):
+    lines = text.strip().splitlines()
+    assert lines and lines[0].startswith("LOAD ")
+    decisions = {}
+    for line in lines[1:]:
+        parts = line.split()
+        assert len(parts) == 3 and parts[0] == "FILTER"
+        assert parts[2] in ("ALLOW", "DENY")
+        decisions[parts[1]] = parts[2]
+    return lines[0], decisions
+
+
+def test_filter_adapter_matches_python_vector(tmp_path, filter_drivers):
+    # Fixed, non-real vector written by Python; C++ must reproduce it exactly.
+    fixture = tmp_path / "adapter_vector.bin"
+    fixture.write_bytes(ab.encode_acl_bitmap(FIXED_VEC))
+    valid = [100000 + 17 * i for i in range(len(FIXED_VEC))]
+    invalid = [99999, 100001, 100000 + 17 * len(FIXED_VEC), 18446744073709551615]
+    expected = {
+        str(label): ("ALLOW" if FIXED_VEC[i] else "DENY")
+        for i, label in enumerate(valid)
+    }
+    expected.update({str(label): "DENY" for label in invalid})
+
+    for name, exe in filter_drivers.items():
+        proc = run_filter(exe, fixture, *(valid + invalid))
+        assert proc.returncode == 0, f"{name}: {proc.stdout}\n{proc.stderr}"
+        load, got = parse_filter_output(proc.stdout)
+        assert load == "LOAD OK", f"{name}: {load}"
+        assert got == expected, f"{name}: C++ decisions disagree with Python vector"
+
+
+def test_filter_denies_unloaded_acl(filter_drivers):
+    # An unloaded ACL has n_ == 0; absence of data must never mean "allow".
+    for name, exe in filter_drivers.items():
+        proc = run_filter(exe, "--unloaded", 100000, 100001, 99999)
+        assert proc.returncode == 0, f"{name}: {proc.stdout}"
+        load, got = parse_filter_output(proc.stdout)
+        assert load == "LOAD UNLOADED"
+        assert got == {"100000": "DENY", "100001": "DENY", "99999": "DENY"}
+
+
+def test_filter_driver_rejects_empty_blob(tmp_path, filter_drivers):
+    header_only = ab.MAGIC + (0).to_bytes(ab.COUNT_LEN, "little", signed=False)
+    p = tmp_path / "zero_count.bin"
+    p.write_bytes(header_only)
+    for name, exe in filter_drivers.items():
+        proc = run_filter(exe, p, 100000)
+        assert proc.returncode == 1, f"{name}: {proc.stdout}"
+        assert proc.stdout.strip() == "LOAD BAD_MEMBER_COUNT"
+
+
+def test_filter_header_is_readonly_and_silent():
+    src = (MODULE_DIR / "hnsw_acl_filter.h").read_text(encoding="utf-8")
+    assert "class SecretAclFilter : public hnswlib::BaseFilterFunctor" in src
+    assert "bool operator()(hnswlib::labeltype id) override" in src
+    assert "explicit SecretAclFilter(const h1acl::AclBitmap& acl)" in src
+    assert "const h1acl::AclBitmap& acl_" in src
+    assert "acl_.lookup_label(" in src
+    for banned in ("std::cout", "std::cerr", "printf", "fopen", "ofstream"):
+        assert banned not in src, f"adapter must not emit/store secret state: {banned}"

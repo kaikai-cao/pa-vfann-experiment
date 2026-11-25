@@ -22,6 +22,9 @@ Frozen binary format (shared with acl_bitmap.h)
     offset 16   Payload      ceil(N / 8) B, LSB-first:
                              authorized(i) = (payload[i // 8] >> (i % 8)) & 1
 
+N must be strictly positive. Both Python and C++ reject N == 0, so an empty
+bitmap is not a legal fixture in either language.
+
 The format contains NO seed, NO authorized count, NO target state, NO A0/A1
 pair marker, NO instance identity and NO public digest that could recover the
 secret state.
@@ -161,6 +164,8 @@ def encode_acl_bitmap(bitmap: Sequence[int]) -> bytes:
         if bit not in (0, 1):
             raise ValueError(f"bitmap[{i}] is not 0/1")
     n = len(bits)
+    if n == 0:
+        raise ValueError("bitmap must be non-empty (N > 0)")
     payload_len = (n + 7) // 8
     payload = bytearray(payload_len)
     for i, bit in enumerate(bits):
@@ -182,6 +187,8 @@ def decode_acl_bitmap(data: bytes) -> list[int]:
     if raw[:MAGIC_LEN] != MAGIC:
         raise ValueError("bad magic or version")
     n = int.from_bytes(raw[MAGIC_LEN:HEADER_LEN], "little", signed=False)
+    if n == 0:
+        raise ValueError("member count must be positive (N > 0)")
     payload_len = (n + 7) // 8
     expected = HEADER_LEN + payload_len
     if len(raw) < expected:
