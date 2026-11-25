@@ -11,10 +11,10 @@
 
 上一轮提出：hnswlib 的 `searchStopConditionClosest` 把 `ef` 设为 `0`，让 `BaseSearchStopCondition` 接管候选考虑、结果维护与停止判断。因此必须先回答两个接口语义问题，才能决定后续是否能在此路径上研究 K-hit 停止：
 
-1. **C1 能否在不改搜索算法的前提下，精确复现标准过滤搜索 `searchKnn + filter`？**
+1. **C1 能否在不改搜索算法的前提下，在本次配置下对齐标准过滤搜索 `searchKnn + filter` 的候选扩展轨迹与 Top-10 结果前缀？**
 2. **若能，C2 的 K-hit 停止在什么控制流边界生效，相对成功过滤检查序列引入多少额外可观察事件？**
 
-本轮只回答这两点。即便 C1 对齐，也**不**自动构成论文贡献——它只是证明原生停止条件接口可被用来表达标准语义。
+本轮只回答这两点。即便 C1 在候选扩展轨迹与 Top-10 前缀上对齐，也**不**自动构成论文贡献，更不代表两个 API 完整等价——它只说明原生停止条件接口可被用来表达标准过滤搜索的这部分语义。
 
 ---
 
@@ -48,7 +48,20 @@
 
 ---
 
-## 4. C0 与 C1 语义等价：通过
+## 4. C0 与 C1 在测试配置下对齐：通过（非完整 API 等价）
+
+C0 and C1 exhibit identical candidate-expansion traces and identical Top-10 result prefixes under the tested configuration. This does not establish full API-level equivalence.
+
+中文含义：C0 与 C1 在本次测试配置下具有一致的候选扩展轨迹和 Top-10 结果前缀，但这不代表两个 API 的完整返回语义等价。
+
+| 对比项 | C0 | C1 |
+| --- | --- | --- |
+| 返回集合大小 | 10 | 64 |
+| Top-10 节点映射 | 一致 | 一致 |
+| Top-10 距离 float32 位模式 | 一致 | 一致 |
+| `distance_eval` 全序列 | 基准 | 与 C0 一致 |
+
+C1 的 64 个返回元素不能写成与 C0 完全相同的 Top-10 返回集合；下面所有“对齐/一致”结论均限于上表限定的范围。
 
 顶层结果（每个 (query, rank) 单元，共 50×10=500）：
 
@@ -62,9 +75,9 @@
 
 三通道指：插桩版 trace on、插桩版 trace off（sink 关闭）、pristine 上游版（无任何插桩）。三组 top-k 在三个通道逐行一致，说明对齐结论既不依赖观测开关，也不依赖插桩本身。
 
-**必要的口径说明（工程语义差异）**：`searchKnn` 返回的 `pair<dist,labeltype>` 第二元素是 **external label**；而 `searchStopConditionClosest` 在 `searchBaseLayerST` 返回后把 `priority_queue<pair<dist,tableint>>` 直接写入 `pair<dist,labeltype>` 结果向量，第二元素是 **internal tableint**（隐式转为 labeltype），并未调用 `getExternalLabel`。因此 C1 结果的 ID 字段数值落在 `0..999`（例如 `17、25、43`），而非 `100000+17i`。本报告的 "Top-10 节点 ID 一致" 是在 `mapped_id = 100000 + 17 × internal_id` 的显式映射后成立；原始 C1/C2 输出保留上游原样，未改写。这是原生停止条件接口与标准搜索接口在**结果标签语义**上的真实差异，后续若在此路径上工作必须处理。
+**必要的口径说明（工程语义差异）**：`searchKnn` 返回的 `pair<dist,labeltype>` 第二元素是 **external label**；而 `searchStopConditionClosest` 在 `searchBaseLayerST` 返回后把 `priority_queue<pair<dist,tableint>>` 直接写入 `pair<dist,labeltype>` 结果向量，第二元素是 **internal tableint**（隐式转为 labeltype），并未调用 `getExternalLabel`。因此 C1 结果的 ID 字段数值落在 `0..999`（例如 `17、25、43`），而非 `100000+17i`。本报告的 "Top-10 节点 ID 一致" 是在 `mapped_id = 100000 + 17 × internal_id` 的显式映射后成立；原始 C1/C2 输出保留上游原样，未改写。The Top-10 identity comparison is performed after applying the deterministic internal-to-external label mapping. The raw return values of the two APIs are not directly interchangeable. 该映射是本次实验的比较口径，不是 API 本身的等价保证。这是原生停止条件接口与标准搜索接口在**结果标签语义**上的真实差异，后续若在此路径上工作必须处理。
 
-C1 对齐成立，因此按任务包停止条件，C2 的结果可继续按“C1 上的 K-hit”解释，而不是“标准搜索上的 K-hit”。
+上述对齐仅指本次配置下的候选扩展轨迹与 Top-10 前缀；按任务包停止条件，C2 的结果可继续按“C1 上的 K-hit”解释，而不是“标准搜索上的 K-hit”。
 
 ---
 
@@ -72,18 +85,25 @@ C1 对齐成立，因此按任务包停止条件，C2 的结果可继续按“C1
 
 50 个查询的 C2 统计：
 
-| 量 | 值 |
+| 指标 | 数值 |
 | --- | --- |
-| 第 K 次成功过滤检查 → 实际 `search_stop` 的事件序号差（gap） | 均值 **27.58**，范围 **3–52** |
-| gap 内严格居间的事件（50 查询合计） | `distance_eval` 398、`candidate_consider` 398、`filter_check` 398、`result_add` 85、`stop_check` 50、`candidate_pop` **0** |
+| K-hit 到 `search_stop` 的事件序号差均值 | **27.58** |
+| 事件序号差范围 | **3–52** |
+| 严格居间事件数均值 | **26.58** |
+| 延迟期间额外 `distance_eval`（50 查询合计） | 398 |
+| 延迟期间额外 `filter_check`（50 查询合计） | 398 |
+| 延迟期间 `candidate_pop`（50 查询合计） | **0** |
+| 其他延迟窗口内事件（50 查询合计） | `candidate_consider` 398、`result_add` 85、`stop_check` 50 |
 | 授权命中计数 | 精确：每查询 `auth_hits == n_filter_ok == returned_size`，范围 10–14 |
 | 每查询 `search_stop` 次数 | 恰 1 |
 | C0 / C1 / C2 返回集合大小 | 10 / 64 / 10–14 |
 
+口径定义：`strictly_between = stop_event_index - khit_event_index - 1`。因此 **27.58 是事件序号差的平均值**，**26.58 才是严格居间事件数的平均值**；两者不能互换。上述统计仅对应本次 50-query 固定配置，不代表一般 HNSW 搜索的理论延迟。
+
 解释（严格限于观测到的控制流）：
 
 - K-hit 命中**不是**命中即停。第 10 次成功过滤检查发生后，搜索仍继续处理当前邻接表剩余邻居；直到 `candidate_set` 循环顶部下一次 `should_stop_search` 才 break。
-- gap 内 `candidate_pop = 0` 是关键证据：这段时间没有弹出下一个候选，全部是对当前候选邻接表的展开与授权检查；`stop_check` 恰 50 条（每查询一次），与“边界检查”一致。
+- 延迟窗口内 `candidate_pop = 0` 是关键证据：这段时间没有弹出下一个候选，全部是对当前候选邻接表的展开与授权检查；`stop_check` 恰 50 条（每查询一次），与“边界检查”一致。
 - 因此相对“成功授权检查序列”，K-hit 停止额外引入可观的距离计算/候选考虑/过滤检查事件——这正是本轮的目标量。原抽象模型里“达到 K 即停”的原子语义，在真实 hnswlib 回调路径上表现为“达到 K 后到下一个循环顶部之间仍有额外可观察事件”。
 - 这些是**控制流事件计数**，不是硬件/缓存/内存访问轨迹；未测 recall 代价（K-hit 会改变返回集合大小 10–14 且 top-k 与 C0 仅 69/500 一致，本报告不把它解读为好或坏的召回结论，只作为停止改变结果的观测）。
 
@@ -106,5 +126,5 @@ C1 对齐成立，因此按任务包停止条件，C2 的结果可继续按“C1
 
 - 本轮**不**证明任何授权成员泄露的新规律：C2 的 K-hit 只是驱动停止，未做成员推断评分，未与 H1.1–H1.4 的攻击比较。
 - 未声称硬件/cache/物理内存轨迹；仅 HNSW 查询控制流事件，单索引、单线程，不对并发作结论。
-- C1 对齐证成的是“原生停止条件接口可表达标准过滤搜索语义（含结果标签需映射这一差异）”，属工程适配结论；是否产生新的可量化泄露或有效缓解，留给后续独立决策，本轮不启动 H1-RM.3/H2。
+- C1 在本次配置下的候选扩展轨迹与 Top-10 前缀对齐，证成的是“原生停止条件接口可表达标准过滤搜索的候选扩展与 Top-10 前缀语义（结果标签需显式映射）”；这不构成完整 API 级等价，属工程适配结论；是否产生新的可量化泄露或有效缓解，留给后续独立决策，本轮不启动 H1-RM.3/H2。
 - 未改 EXP-01/EXP-08/EXP-09/EXP-10 冻结内容；未下载 FiQA/qrels/模型；未建 PR。
