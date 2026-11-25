@@ -1,0 +1,9 @@
+{
+  "selected": null,
+  "rule": "visit_reduction>=0.20 AND mean_recall_drop<=0.05 AND max_group_recall_drop<=0.10",
+  "tie_break": "max mean_visited_reduction then min mean_recall_drop",
+  "tuning_query_ids": [
+    0,
+    99
+  ]
+}
