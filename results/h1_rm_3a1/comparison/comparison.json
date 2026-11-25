@@ -1,0 +1,120 @@
+{
+  "config": {
+    "N": 1000,
+    "DIM": 16,
+    "M": 16,
+    "ef_construction": 200,
+    "ef_search": 64,
+    "K": 10,
+    "NQ": 50,
+    "seed": 2026,
+    "label_rule": "100000 + 17*i",
+    "groups": [
+      "C0",
+      "C1",
+      "C2"
+    ]
+  },
+  "byte_identity": {
+    "events.jsonl": {
+      "baseline_sha256": "9efcb897298948d23f2f734e9dd29c5eec2a6d4812cbba9af24327e614bb7ccc",
+      "bridged_sha256": "9efcb897298948d23f2f734e9dd29c5eec2a6d4812cbba9af24327e614bb7ccc",
+      "identical": true,
+      "baseline_lines": 428107,
+      "bridged_lines": 428107
+    },
+    "topk.jsonl": {
+      "baseline_sha256": "69fc51eaea4b8c6a73973bcd8b1e1cb085451f7432a55d5c3bce4903da2811c8",
+      "bridged_sha256": "69fc51eaea4b8c6a73973bcd8b1e1cb085451f7432a55d5c3bce4903da2811c8",
+      "identical": true,
+      "baseline_lines": 1500,
+      "bridged_lines": 1500
+    }
+  },
+  "events_by_type": {
+    "distance_eval": {
+      "count": 108152,
+      "mismatches": 0,
+      "record_equal": 108152,
+      "dist_bits_equal": 108152,
+      "extra_equal": 108152
+    },
+    "filter_check": {
+      "count": 81338,
+      "mismatches": 0,
+      "record_equal": 81338,
+      "dist_bits_equal": 81338,
+      "extra_equal": 81338
+    },
+    "stop_check": {
+      "count": 62427,
+      "mismatches": 0,
+      "record_equal": 62427,
+      "dist_bits_equal": 62427,
+      "extra_equal": 62427
+    },
+    "candidate_pop": {
+      "count": 62277,
+      "mismatches": 0,
+      "record_equal": 62277,
+      "dist_bits_equal": 62277,
+      "extra_equal": 62277
+    },
+    "candidate_consider": {
+      "count": 104252,
+      "mismatches": 0,
+      "record_equal": 104252,
+      "dist_bits_equal": 104252,
+      "extra_equal": 104252
+    },
+    "result_add": {
+      "count": 8223,
+      "mismatches": 0,
+      "record_equal": 8223,
+      "dist_bits_equal": 8223,
+      "extra_equal": 8223
+    },
+    "result_remove": {
+      "count": 1288,
+      "mismatches": 0,
+      "record_equal": 1288,
+      "dist_bits_equal": 1288,
+      "extra_equal": 1288
+    },
+    "search_stop": {
+      "count": 150,
+      "mismatches": 0,
+      "record_equal": 150,
+      "dist_bits_equal": 150,
+      "extra_equal": 150
+    }
+  },
+  "topk_records": {
+    "baseline_count": 1500,
+    "bridged_count": 1500,
+    "all_equal": true
+  },
+  "request_trace": {
+    "total_records": 253302,
+    "node_read_records": 108796,
+    "neighbor_read_records": 144206,
+    "distinct_query_group_units": 150,
+    "units_by_group": {
+      "C0": 50,
+      "C1": 50,
+      "C2": 50
+    },
+    "ordered_by_seq": true,
+    "all_units_have_query_start": true,
+    "all_units_have_query_end": true,
+    "duplicate_seq_keys": 0,
+    "query_id_visible": true,
+    "node_id_visible": true,
+    "batch_reads": "none; one node/neighbor per request record"
+  },
+  "gate": {
+    "semantic_preserved": true,
+    "bridge_complete": true,
+    "decision": "PASS"
+  }
+}

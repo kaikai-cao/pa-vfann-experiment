@@ -1,0 +1,53 @@
+{
+  "experiment": "H1-RM.3A.1",
+  "base_commit": "6d63c070fd3e64da3cbb08514a231dde8dd48f38",
+  "parent_commit": "ea7b7bdbd3c76ec08549a452bd4c631d32705ef6",
+  "branch": "research/h1-rm-3a1-storage-access-bridge",
+  "files": [
+    {
+      "path": "results/h1_rm_3a1/baseline/events.jsonl",
+      "sha256": "9efcb897298948d23f2f734e9dd29c5eec2a6d4812cbba9af24327e614bb7ccc",
+      "bytes": 69394286
+    },
+    {
+      "path": "results/h1_rm_3a1/baseline/requests.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "results/h1_rm_3a1/baseline/run_summary.jsonl",
+      "sha256": "d64f952bffa7ba6a8beb947a72457e78a1b7e26c27d231bb9665933e630d01a8",
+      "bytes": 44742
+    },
+    {
+      "path": "results/h1_rm_3a1/baseline/topk.jsonl",
+      "sha256": "69fc51eaea4b8c6a73973bcd8b1e1cb085451f7432a55d5c3bce4903da2811c8",
+      "bytes": 124109
+    },
+    {
+      "path": "results/h1_rm_3a1/bridged/events.jsonl",
+      "sha256": "9efcb897298948d23f2f734e9dd29c5eec2a6d4812cbba9af24327e614bb7ccc",
+      "bytes": 69394286
+    },
+    {
+      "path": "results/h1_rm_3a1/bridged/requests.jsonl",
+      "sha256": "0f835bbe8a69d68f90bd3e3d3e2e863432322c85fc9adf78cdceb6d4898baf4a",
+      "bytes": 27329706
+    },
+    {
+      "path": "results/h1_rm_3a1/bridged/run_summary.jsonl",
+      "sha256": "d64f952bffa7ba6a8beb947a72457e78a1b7e26c27d231bb9665933e630d01a8",
+      "bytes": 44742
+    },
+    {
+      "path": "results/h1_rm_3a1/bridged/topk.jsonl",
+      "sha256": "69fc51eaea4b8c6a73973bcd8b1e1cb085451f7432a55d5c3bce4903da2811c8",
+      "bytes": 124109
+    },
+    {
+      "path": "results/h1_rm_3a1/comparison/comparison.json",
+      "sha256": "0c53bed7aca228389ca0e32ddee6469a359d48b36b4d7746322b524e5fdac4a4",
+      "bytes": 3013
+    }
+  ]
+}

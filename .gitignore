@@ -9,3 +9,10 @@ __pycache__/
 # H1-RM.2 full raw event log (67MB, regenerable); committed audit subset is
 # results/h1_rm2/events_audit.jsonl
 results/h1_rm2/trace_on/events.jsonl
+
+# H1-RM.3A.1 full raw logs (regenerable). Committed subsets are
+# results/h1_rm_3a1/events_audit.jsonl and requests_audit.jsonl; hashes in
+# results/h1_rm_3a1/raw_hashes.json.
+results/h1_rm_3a1/baseline/events.jsonl
+results/h1_rm_3a1/bridged/events.jsonl
+results/h1_rm_3a1/bridged/requests.jsonl
