@@ -1,8 +1,8 @@
-# MINIMAL_EXPERIMENT_DESIGN.md — 最小可执行配对实验设计（R0.2.1 修订版）
+# MINIMAL_EXPERIMENT_DESIGN.md — 最小可执行配对实验设计（R0.2.1a 修订版）
 
-任务：EXP-02-R0.1 Phase 5 初稿 → EXP-02-R0.2 Phase 4 修订 → EXP-02-R0.2.1 Phase 3–4 统计任务拆分与独立性审计。性质：**实验规格，本轮不执行**。
+任务：EXP-02-R0.1 Phase 5 初稿 → EXP-02-R0.2 Phase 4 修订 → EXP-02-R0.2.1 Phase 3–4 统计任务拆分与独立性审计 → EXP-02-R0.2.1a Phase 1–4 统计口径精确修订。性质：**实验规格，本轮不执行**。
 
-**修订缘由**：初稿把架构 A 定为"阴性对照"、架构 C 定为"唯一主场景"，这是逻辑跳步。R0.2 修正后，**首要检验对象是架构 A 的间接泄漏因果链**（ACL → 上下文 → 后续自适应检索 → 服务端可见轨迹变化）。R0.2.1 进一步修正两处统计错误：(i) 把原本混合的"跨主体角色推断"与"同主体权限状态变化检测"拆成两个不同 estimand，使用不同划分；(ii) 用原始文件实测 ACL 事件与撤权探针的**独立统计单位**，纠正"148 probes + 32 events = 样本量"的错误相加。
+**修订缘由**：初稿把架构 A 定为"阴性对照"、架构 C 定为"唯一主场景"，这是逻辑跳步。R0.2 修正后，**首要检验对象是架构 A 的间接泄漏因果链**（ACL → 上下文 → 后续自适应检索 → 服务端可见轨迹变化）。R0.2.1 修正两处统计错误：(i) 把"跨主体角色推断"与"同主体权限状态变化检测"拆成两个 estimand，使用不同划分；(ii) 用原始文件实测独立统计单位，纠正"148 probes + 32 events = 样本量"的错误相加。**R0.2.1a 按独立验收意见再修三处口径**：(a) 19 个 `(user,doc,canary)` 目标键不是 19 个独立统计簇，独立簇记 `UNKNOWN`；(b) 49 事件的精确独立簇数无法从原始字段确认，记 `UNKNOWN`，只报告 4 组 reason 文本推断的继承链；(c) 区分 3 个 `move_date` 主体与 186 个具备静态 `team_id` 标签的主体，并纠正"组历史为空"的事实错误（14 组共 19 条历史，三个变化主体均有主体级记录）。本轮只改统计口径，不重审 ASQ 源码、不寻找后端、不生成轨迹。
 
 设计前提：
 - 数据：ACL Benchmark 提供主体、ACL、时点真值；ASQ 生成流程可复用其多步记录机制但需三项改造（自定义索引/retriever、ACL 拦截、主体身份字段）——见 `AGENT_GENERATION_AUDIT.md`。
@@ -75,7 +75,7 @@
 4. **B4 相对 B2 是否有稳定增益**——配对差值。
 
 ### 5.2 指标（按 estimand 归属，R0.2.1 修订）
-- **任务 I（跨主体，主体不相交划分）**：Role Macro-F1；Effective Permission Scope 多标签宏观 F1 / 子集准确率。报告主体数并核对 §7.3 独立性——当前 `NOT_EVALUABLE`。
+- **任务 I（跨主体，主体不相交划分）**：Role Macro-F1；Effective Permission Scope 多标签宏观 F1 / 子集准确率。报告主体数并核对 §7.5 静态标签覆盖（186/186 有 team_id）——当前 `NOT_EVALUABLE`（无 Agentic 轨迹）。
 - **任务 II（同主体纵向，按事件簇划分）**：Policy-state Accuracy；Revocation Detection AUROC。Bootstrap 以独立事件簇为单位，不得按单条 probe（见 §6.2）。
 - **核心比较量**：`Δ = B4 − B2`（各指标配对差值），报告均值与配对 Bootstrap 95% CI 下界；须标明是任务 I 还是任务 II 的 Δ。
 - **次要**：Task-category Accuracy、Recall@K。
@@ -99,7 +99,7 @@
 | 不足处理 | 类别缺失或主体数量不足 → 标 `NOT_EVALUABLE`，不补造 |
 | 禁止 | 复制轨迹、重复采样、把同一主体的多个 session 当成独立主体扩充样本量 |
 
-**样本现实**：明确角色变更主体仅 3 个（u4/u019/u044），且经 R0.2.1 实测（§7.3）u019/u044 在 golden 中 **0 条 QA**、无组历史成员变更记录，u4 虽有 52 条 time-travel QA 但 asking_user 全为 u4。**这 3 个主体不能支撑可信的跨主体角色变化泛化结论**——主体不重叠划分后测试主体可能仅 1 个。任务 I 当前 `NOT_EVALUABLE`。
+**样本现实（R0.2.1a 修订）**：需区分两个不同口径——(i) **静态角色标签主体有 186 个**（全部有 `team_id`、9 类，且有 group membership，见 §7.5），这是任务 I 的候选样本池；(ii) 其中**角色变更主体仅 3 个**（u4/u019/u044，有 `move_date`），u019/u044 在 golden 中 0 条 QA。不得用"3 个变化主体"推导任务 I 只有 3 个可用主体。**任务 I 当前 `NOT_EVALUABLE` 的真正原因是没有任何 Agentic 轨迹**（ACL benchmark 有真值无轨迹、ASQ 有轨迹无 ACL 真值，禁止拼接），而非静态标签主体数量不足。角色变化分支（B）仍只有 3 主体且 2 无 QA，不支撑可信的跨主体角色变化泛化。
 
 ### 6.2 任务 II：同主体权限状态变化检测（纵向监测）
 
@@ -117,8 +117,8 @@
 **Bootstrap 规则（任务 II）**：
 - **不得按单条 probe 重采样**。先根据原始数据中的主体、容器、ACL 事件与探针关联关系识别重复/重叠样本。
 - 以**独立 ACL 事件或更高层级的独立事件簇**为重采样单位。
-- 若多个事件共享主体或容器，必须解释如何处理相关性（本数据确有此情况：20 条继承传播事件共享 4 个根因、4 个容器各有 2 事件、u5 出现在 10 事件、u4 出现在 11 事件）。
-- 若最终只能得到很少的独立事件簇，必须报告统计不足，**不得用 148 条探针的记录数量掩盖独立样本不足**。
+- 若多个事件共享主体或容器，必须解释如何处理相关性（本数据确有此情况：20 条继承传播事件共享 4 个 reason 文本推断的根因、4 个容器各有 2 事件、u5 出现在 10 事件、u4 出现在 11 事件）。事件表**没有结构化父事件字段**，继承关系只存于 reason 文本，精确独立事件簇数 `UNKNOWN`（§7.2）。
+- 若最终只能得到很少的独立事件簇，必须报告统计不足，**不得用 148 条探针的记录数量或 19 个目标键数量掩盖独立样本不足**。
 
 ### 6.3 两种划分不可混用（写死）
 
@@ -132,64 +132,108 @@
 
 ---
 
-## 7. ACL 原始数据统计独立性审计（R0.2.1 Phase 4 实测）
+## 7. ACL 原始数据统计独立性审计（R0.2.1 Phase 4 实测 → R0.2.1a Phase 1–4 口径修订）
 
-数据源：`$TEMP/exp02_r0_data/acl/` 下固定 revision（ACL `6e3bb8d`）原始文件：`acl_acl_matrix.json`、`acl_groups.json`、`acl_identities.json`、`eval_golden.jsonl`、`eval_acl_leak_probes.jsonl`、`world/bible.json`。本轮**只读**，未修改脚本与 JSON 证据文件。下表每个数字标明：原始记录数 / 不同主体数 / 不同容器数 / 不同事件数 / 可配对数 / 独立统计簇数 / 是否可评估；无法从原始文件确认的标 `UNKNOWN`。
+数据源：`$TEMP/exp02_r0_data/acl/` 下固定 revision（ACL `6e3bb8d`）原始文件：`acl_acl_matrix.json`、`acl_groups.json`、`acl_identities.json`、`eval_golden.jsonl`、`eval_acl_leak_probes.jsonl`、`world/bible.json`。两轮均**只读**，未修改脚本与 JSON 证据文件。本轮（R0.2.1a）按独立审查意见修正三处口径：(i) 19 个目标键不再冒充 19 个独立统计簇，独立簇记 `UNKNOWN`；(ii) 49 事件不再给出看似精确的独立簇数字，改报可确认依赖 + `UNKNOWN`；(iii) 区分 3 个 `move_date` 主体与 186 个具备静态角色标签的主体，并纠正"组历史为空"的事实错误。
 
-### 7.1 总体统计独立性表
+### 7.1 总体统计独立性表（R0.2.1a 修订）
 
-| 数据对象 | 原始记录数 | 不同主体 | 不同容器 | 不同事件 | 可配对 | 独立统计簇 | 可评估 |
-|---|---|---|---|---|---|---|---|
-| ACL 变更事件 | 49 | 7（用户字段中出现） | 45 | 49 | UNKNOWN（无事件前/后轨迹） | **21 时间戳 / 4 继承组 → 远小于 49** | 否（无轨迹） |
-| post-revocation probes | 148 | **1（全 u4）** | 16 | UNKNOWN（无事件关联字段） | UNKNOWN | **19（user,doc,canary）组合，每组最多 8 措辞** | 否（不可当独立样本） |
-| role-change 主体 | 3（u4/u019/u044） | 3 | UNKNOWN | UNKNOWN | 仅 u4 有 QA | 1（仅 u4 有 golden） | 任务 I 否；任务 II 部分 |
-| acl_time_travel QA | 52 | 1（全 u4） | UNKNOWN | UNKNOWN | 2 时点（2026-06-15 / 2026-08-15） | 2 时点 × 目标 | 有限 |
+| 数据对象 | 原始记录数 | 不同主体 | 不同容器 / 目标键 | 不同时间戳 | 可确认事件关联 | 可配对 pre/post 轨迹 | 独立统计簇 | 可评估 |
+|---|---|---|---|---|---|---|---|---|
+| ACL 变更事件 | 49（event_id 49 个唯一） | 7（allow/deny_users 中出现） | 45 容器 | 21（完整 timestamp；20 个日期） | 自身即事件；无跨表关联字段 | 0（无事件前/后轨迹） | **UNKNOWN**（可确认 4 组文本推断继承链，各 5 条） | 否（无轨迹） |
+| post-revocation probes | 148 | **1（全 u4）** | 19 distinct target keys（16 容器前缀） | 1（2026-09-15T12:00:00Z） | **0**（无 event_id / 事件引用字段；真实对应 UNKNOWN） | **0** | **UNKNOWN**（19 只是不同目标键，非已证实独立簇） | 否（Task II `NOT_EVALUABLE`） |
+| role-change 主体 | 3（u4/u019/u044） | 3 | — | 3 个 move_date | 3 主体均有主体级组历史（u4 8 / u019 3 / u044 2 条） | 0（u4 52 条 time-travel QA 是研究者侧真值，非轨迹） | UNKNOWN | 任务 I 否；任务 II 否 |
+| 静态角色标签主体 | 186 | **186/186 有 team_id（9 类）、186/186 有组资格** | — | — | — | 0（无 Agentic 轨迹） | 待主体级划分后确认 | 任务 I 当前 `NOT_EVALUABLE`（无轨迹） |
+| acl_time_travel QA | 52 | 1（全 u4） | — | 2（2026-06-15 / 2026-08-15） | — | 2 时点 × 目标（真值，非轨迹） | 有限 | 否（缺检索轨迹） |
 
-### 7.2 49 条 ACL 事件（6.1 要求）
+**禁止**：把 19 个 distinct target keys 写成 19 个 independent statistical clusters；把 21 个时间戳写成 21 个独立事件；把 3 个 `move_date` 主体当作任务 I 的全部可用样本主体。下表所有无法从原始字段确认的精确簇数一律标 `UNKNOWN`，不强行计算。
 
+### 7.2 49 条 ACL 事件（6.1 要求，R0.2.1a 修订）
+
+逐条读取的字段：`event_id`、`container`、`timestamp`、`reason`、`allow_users`、`deny_users`、`allow_groups`（**无** `deny_groups`、**无** `inherits_from`/`parent_event`/`root_event` 等结构化父事件字段）。
+
+| 统计对象 | 数值 | 口径 |
+|---|---|---|
+| 原始记录数 | 49 | 49 个 `event_id` 全部唯一 |
+| 不同时间戳数 | **21**（完整 timestamp；按日期为 20） | ≠ 独立事件数 |
+| 不同根因 / 父事件数 | **UNKNOWN** | 事件表**没有**结构化根因字段；只能从 `reason` 文本前缀 "Inherited from …" 提取 |
+| 已识别继承传播组数 | **4 组，各 5 条 = 20 条** | 根因 token：CONF-IDN-0002 / CONF-SEC-0002 / CONF-PAY-0002 / CONF-EXEC-0002；**这是 reason 文本推断，不是结构化字段** |
+| 其余非传播事件 | 29 条，29 个不同 reason 文本 | 无重复 reason；彼此是否共享主体/容器/策略链未确认 |
+| **精确独立事件簇数** | **UNKNOWN** | 不强行计算（见下方理由） |
+
+- **不能把 21 个时间戳当 21 个独立事件**：不同根因可能落在同一时间戳（如 2026-07-01 同时发生 u4 转 SEC、PAY deny 两组链），同一策略变更也可能跨多个时间戳体现为连续变化；除 4 组已识别继承传播外，其余事件是否共享主体/容器/策略变更链仍需判断。可确认的依赖关系仅止于"4 组文本推断继承链"，精确独立簇数标 `UNKNOWN`，不给具体数字。
 - **容器 / 用户**：49 条事件涉及 **45 个不同容器**；用户字段（`allow_users`/`deny_users`）仅出现 **7 个用户**：u1, u2, u3, u4, u5, u6, u175。
-- **用户级 vs 组级**：35 条含用户字段、48 条含组字段、34 条两者兼有。绝大多数是**组级变化**（`allow_groups` 高频值：leads 20、security-cleared 20、project-aurora-tiger 11、team-identity 8、exec-staff 7…）。
-- **同一主体出现在多事件**：是。u4 出现在 11 条、u5 在 10 条、u6 在 8 条、u175 在 3 条、u2 在 2 条。主体间高度相关，不可当独立样本。
+- **用户级 vs 组级**：22 条含 `allow_users`、13 条含 `deny_users`、48 条含 `allow_groups`（无 `deny_groups`）。绝大多数是**组级变化**（`allow_groups` 高频值：leads 20、security-cleared 20、project-aurora-tiger 11、team-identity 8、exec-staff 7…）。
+- **同一主体出现在多事件**：u4 出现在 11 条、u5 在 10 条、u6 在 8 条、u175 在 3 条、u2 在 2 条。主体间高度相关，不可当独立样本。
 - **同一容器多事件**：4 个容器有 2 条事件（`jira:project:SUP`、`github:repo:aurora-tiger-core`、`slack:channel:C0092`、`slack:channel:C0096`），其余 41 容器各 1 条。
-- **策略变更链**：**20 条是 "Inherited from ..." 传播事件**，分属 4 个根因（CONF-IDN-0002、CONF-SEC-0002、CONF-PAY-0002、CONF-EXEC-0002，各 5 条）。它们是同一次策略变更向子树的传播，**不构成 20 个独立事件**。49 条事件只有 **21 个不同时间戳**（最早 2026-03-01、最晚 2026-09-25）。因此按独立变更簇计，事件数远小于 49。
-- **实际受影响主体**：**无法从原始文件完整确认**。字段含义不清：`groups.json` 的 `history` 字段对 u4/u019/u044 均为空（无结构化组成员变更记录），角色变化只体现在 `world/bible.json` 的 `move_date` 与事件 `reason` 文本；`allow_groups` 的组在事件时刻的成员需另查 `initial_members`（组历史为空），但事件未给出时点快照。**不得把 `allow_users`/`deny_users` 中出现的用户简单等同于全部受影响主体**（组级变化通过组成员影响更多人），标 `UNKNOWN`。
+- **容器继承树（区别于事件根因）**：`containers` 表 210 个容器中 49 个带结构化 `inherits_from`、45 个带 `permission_history`（共 49 条）；这是**容器层级继承**，不是事件之间的父事件关系，不能用它把事件归并为独立簇。4 个根因 token（CONF-…-0002）既不匹配任何 `event_id`，也不匹配容器键。
+- **实际受影响主体**：**UNKNOWN**。仅凭 `allow_users`/`deny_users` 字段出现的人数**不等于**全部受影响主体——组级变化通过组成员影响更多人，事件时刻组成员需由 `initial_members` + 带时间戳的 `history` 重建（见 §7.4）。事件字段语义为全量状态列表（evidence 记录 45/45 最终态=末事件），但事件时刻的逐主体有效权限范围未在原始文件给出快照，标 `UNKNOWN`。
 
-### 7.3 148 条 post-revocation probes（6.2 要求）
+### 7.3 148 条 post-revocation probes（6.2 要求，R0.2.1a 修订）
 
-- **原始记录 / 主体 / 时间**：148 条，但 **asking_user 全部为 u4（1 个主体）**，`asked_at` 全部为 **2026-09-15T12:00:00Z（1 个时间点）**，无事件时间字段、无查询时间字段（除 asked_at）。
-- **目标**：19 个不同 `forbidden_doc_ids`、19 个不同 `forbidden_canary_ids`，落在 16 个容器前缀（confluence:EXEC/PAY/PLAT、github:aurora-tiger-core/ledger-core/payout-gateway、jira、slack:C0091/C0092/C0095/C0098、slack:D0104/D0109/D0110/D0111/D0112）。
-- **能否对应具体 ACL 事件**：**不能**。probe 记录无 `event_id` 或事件引用字段；仅 query 文本提到 "before 2026-09-15"，与 u4 转队日 2026-07-01 及 9 月撤权事件并非严格对应，标 `UNKNOWN`。
-- **是否同主体同文档同事件不同措辞**：**是**。(user, doc, canary) 组合仅 **19 个**，每个组合最多重复 **8 次**（不同 query 措辞）；19 个组合全部重复 >1 次。即 148 条探针实际是 19 个目标的多次改写。
-- **重复模板 / 近重复**：query 均为模板化自然语言（"Since I already saw…", "As a former participant…", "I need to finish my personal wrap-up notes…"），属近重复，不可作独立 Bootstrap 样本。
+逐项统计结果（全部来自固定 revision 原始 `eval_acl_leak_probes.jsonl`，`attack_type == post_revocation_ask`）：
 
-**必须分别报告（禁止相加）**：
-
-| 量 | 数值 |
+| 统计项 | 数值 |
 |---|---|
 | probe records | 148 |
-| independent subjects | **1**（u4） |
-| independent ACL events（可确认关联） | **0**（无事件引用字段，UNKNOWN） |
-| independent (user,doc,canary) 目标组合 | **19** |
+| distinct asking_user | **1**（全 u4） |
+| distinct asked_at | **1**（2026-09-15T12:00:00Z） |
+| distinct forbidden_doc_ids | **19** |
+| distinct forbidden_canary_ids | **19** |
+| distinct `(user, doc, canary)` 目标键 | **19**（15 键 × 8 条 + 4 键 × 7 条 = 148） |
+| 可确认的 ACL `event_id` 数 | **0**（记录无 event_id / 事件引用字段） |
+| 可确认的 pre/post 轨迹配对数 | **0**（本轮未生成轨迹） |
+| 可确认的独立统计簇数 | **UNKNOWN** |
 
-`148 probes + 32 events = 统计样本量` 是**错误相加**：148 条只有 1 主体、19 目标、无事件对应；32 条触及 golden 用户的事件含大量继承传播与同主体重复。
+- **19 个目标键 ≠ 19 个独立统计簇**。它们是 19 个不同 `(user, doc, canary)` 目标键；这些目标是否对应不同 ACL 事件、是否共享撤权根因、是否相互独立，**原始文件没有证据**，不得直接称为 independent statistical clusters。
+- **事件关联**：probe 记录字段仅 `probe_id`/`asking_user`/`asked_at`/`query`/`forbidden_canary_ids`/`forbidden_doc_ids`/`attack_type`，**无 event_id 或明确事件关联字段** → confirmed event links = 0，真实事件对应关系 `UNKNOWN`。仅 query 文本提到 "before 2026-09-15"，与 u4 转队日 2026-07-01 及 9 月事件并非严格对应。
+- **无事件前后轨迹**：148 条全为同一时点的 post-only 探针，没有事件前轨迹与之配对 → **Task II 现有 probe 数据 `NOT_EVALUABLE`**。
+- **重复措辞 / 近重复**：query 均为模板化自然语言（"Since I already saw…", "As a former participant…"），属近重复，不可作独立 Bootstrap 样本；不得把重复措辞拆成独立样本扩充样本量。
+- 全体 1040 探针覆盖 5 个 `asking_user`（u1/u2/u3/u4/u176），但那是其他 attack_type；**post-revocation 这一类仍全为 u4**，两者不得混算。
 
-### 7.4 角色变化主体 u4/u019/u044（6.3 要求）
+`148 probes + 32 events = 统计样本量` 是**错误相加**：148 条只有 1 主体、1 时点、19 目标键、无事件对应、无前后轨迹；32 条触及 golden 用户的事件含大量继承传播与同主体重复。
 
-| 主体 | 变化前→后时间 | 组历史变化 | ACL 容器变化 | 可配对事件前后任务 | 独立轨迹/探针 |
+### 7.4 组历史与角色变化主体（6.3 要求，R0.2.1a 事实勘误）
+
+**先纠正一处事实错误**：R0.2.1 文档曾写"`groups.json` 的 `history` 字段对 u4/u019/u044 均为空"。按 `user_id` 字段精确核验（排除 `u4` 误匹配 `u004` 等前缀），该表述**不成立**：
+
+- **全局组历史非空**：25 个组中 **14 个组有 history，共 19 条带时间戳记录**。禁止笼统写成"整个 `groups.json` 都没有历史"。
+- **三个角色变化主体都有主体级组历史记录**（`action` + `user_id` + `timestamp` + `reason` 结构化字段）：
+
+| 主体 | 变化前→后（bible `move_date`） | 主体级组历史（按 user_id 精确匹配） | golden QA | ACL 事件 reason 提及 | 可配对事件前后任务 |
 |---|---|---|---|---|---|
-| u4 | payments→security，2026-07-01 | `groups.json` history **空**；仅 reason 文本与 move_date | 多事件 reason 提及（PAY deny、SEC refresh 等），但无时点成员快照 | 52 条 `acl_time_travel` QA，时点 2026-06-15（转队前）/ 2026-08-15（转队后），asking_user 全 u4 | golden 中 u4 共 89 条；无真实检索轨迹（本轮未生成） |
-| u019 | platform→sre，2026-03-15 | history 空 | 无 golden、无 probe | **0 条 QA**，无配对任务 | 无 |
-| u044 | growth→data，2026-08-15 | history 空 | 无 golden、无 probe | **0 条 QA**，无配对任务 | 无 |
+| u4 | payments→security，2026-07-01 | **8 条**：team-payments remove、team-security add、security-cleared add、project-aurora-tiger remove、project-obsidian-kite add、audit-taskforce add、on-call-payments remove、on-call-security add（多在 2026-07-01） | 89 条（含 52 条 time-travel） | 11 条事件（PAY deny、SEC refresh 等） | 52 条 time-travel QA 有 2 时点真值，但**是研究者侧真值、非服务端可见轨迹** |
+| u019 | platform→sre，2026-03-15 | **3 条**：team-platform remove、team-sre add、incident-responders add（2026-03-15） | **0 条 QA** | 无 | 无配对任务 |
+| u044 | growth→data，2026-08-15 | **2 条**：team-growth remove、team-data add（2026-08-15） | **0 条 QA** | 无 | 无配对任务 |
 
-- u019/u044 只有角色变更真值（move_date），**没有任何对应 QA 或轨迹**，不得声称已能参与评估。
-- u4 的 52 条 time-travel QA 是**研究者侧真值**，不是服务端可见轨迹；且 2 个时点是否跨其转队日（2026-07-01）需按具体容器判断（06-15 前、08-15 后），可作有限配对，但仍缺真实检索轨迹。
-- 组历史为空削弱"角色变化的组成员语义"判定：角色的时点变化只有 `move_date` 单一真值，无结构化成员加入/退出事件序列。
+- **主体级历史 vs 全局组历史严格区分**：上表是"该主体出现在哪些组的 add/remove history 中"，不能写成"组历史为空"；全局 19 条组历史分布在 14 个组是另一统计对象。
+- **组成员可恢复性**：14 个组有 `initial_members` + 带时间戳的 `history`，因此**原则上可按事件时点重建组成员**；配合 210 个容器均带 `initial_acl`、45 个容器带 `permission_history`（49 条，evidence 记录 45/45 最终态=末事件），可按 `initial_acl + 时间排序事件` 重建时点 ACL。据此**原则上可计算** `allow_groups`/`deny_groups` 变化影响的主体集合——但需按"时点组成员"计算，**不得把 `allow_users`/`deny_users` 字段中出现的人数当作全部受影响人数**（组级变化通过组成员影响更多人）。本轮为统计口径审计，未实际逐事件重建，精确受影响主体数标 `UNKNOWN`。
+- u019/u044 有角色变更真值与结构化组历史，但**没有任何 golden QA 或探针**，不得声称已能参与评估。
+- u4 的 52 条 time-travel QA 是研究者侧真值、不是服务端可见轨迹；2 时点（06-15 转队前 / 08-15 转队后）可作有限真值配对，但仍缺真实检索轨迹。
 
-### 7.5 结论
+### 7.5 186 个主体的静态角色标签覆盖（6.1 要求，R0.2.1a 新增）
 
-- 任务 I（跨主体角色推断）：**NOT_EVALUABLE**（3 主体、2 无 QA、无轨迹）。
-- 任务 II（同主体状态变化检测）：撤权探针独立单位严重不足（1 主体 / 19 目标 / 无事件对应）；time-travel QA 仅 u4、2 时点。**当前原始文件不足以检验主要假设**；须在生成的 opaque 轨迹上按独立事件簇重新构造，并明确事件关联字段。
-- 本审计不否定架构 A 因果假设，但表明**统计独立单位是比记录数量更硬的约束**。
+`identities.json`、`world/bible.json` 各 186 个主体、`groups.json` 25 组。逐项统计（审查意见问题三：不得用 3 个 `move_date` 主体推导任务 I 的全部样本）：
+
+| 统计对象 | 数值 | 说明 |
+|---|---|---|
+| 有明确 `move_date` 的角色变化主体 | **3**（u4/u019/u044） | 角色**变化检测**（任务 B / 任务 II）样本 |
+| 有跨主体静态角色标签的用户 | **186/186** | `world/bible.json` 每个用户有 `team_id`，9 类：data/growth/identity/mobile/payments/platform/security/sre/support-eng |
+| 有可用 group membership 标签的用户 | **186/186** | 186 个 canonical_id 全部至少出现在一个组的 `initial_members`/`members` 中 |
+| 有真实前后角色变化配对轨迹的主体 | **0** | 无任何 Agentic 检索轨迹；u4 的 52 条 time-travel QA 是研究者侧真值 |
+| golden QA 覆盖主体 | **6**（u1/u2/u3/u4/u5/u6） | 研究者侧 QA，非服务端轨迹；u019/u044 零 QA |
+| 全体探针覆盖主体 | **5**（u1/u2/u3/u4/u176） | 其中 post-revocation 仅 u4 |
+| 有可构造、不依赖研究者侧伪标识的 Agent 轨迹主体 | **UNKNOWN**（当前 0 条真实轨迹） | 轨迹需在生成阶段构造；生成后主体伪标识须服务端可见，研究者侧 `canonical_id`/`asking_user` 不得冒充 |
+
+- **静态跨主体角色推断（A）** 与 **角色变化检测（B）严格区分**：A 的候选样本是全部 186 个有 `team_id` 标签的主体；B 的样本是 3 个 `move_date` 主体。**3 个变化主体不能当作 A 的全部样本**。
+- 任务 I 当前 `NOT_EVALUABLE` 的**理由需精确化**：不是"只有 3 个主体"，而是**186 个主体虽有静态标签，但没有任何 Agentic 轨迹**（ASQ 轨迹无 ACL 真值、ACL benchmark 有真值无轨迹，禁止拼接）。样本规划应基于 186 个标签主体的覆盖面，而非 3 个变化主体。
+- 若全部主体的标签覆盖仍无法核验（例如标签真值可信度、命名空间耦合），标 `UNKNOWN`；本轮仅核对字段存在性与取值，未审计标签语义真伪。
+
+### 7.6 结论
+
+- 任务 I（跨主体角色推断）：**NOT_EVALUABLE**（186 主体有静态 `team_id` 标签，但 0 条 Agentic 轨迹；u019/u044 在 golden 无 QA 只影响角色变化分支，不影响静态标签覆盖面）。
+- 任务 II（同主体状态变化检测）：撤权探针独立单位严重不足（1 主体 / 1 时点 / 19 目标键 / 0 事件关联 / 0 前后轨迹；独立簇 UNKNOWN）；time-travel QA 仅 u4、2 时点真值。**当前原始文件不足以检验主要假设**；须在生成的 opaque 轨迹上按独立事件簇重新构造，并明确事件—探针关联字段与 pre/post 配对。
+- 本审计不否定架构 A 因果假设，但表明**统计独立单位是比记录数量更硬的约束**；也不把事实性勘误（组历史非空、静态标签 186）误当成可评估性提升——可评估性的硬阻塞仍是"无轨迹 + 无事件关联"。
 
 ---
 
@@ -213,6 +257,6 @@
 2. **确认主体伪标识与 session 标识是否服务端可见**，或确定时间戳切分方案与误差上界；
 3. 确认生成器后端（本地权重 / API）及其可复现性与成本；
 4. （R0.2.1 新增）**确认一个符合查询隐私要求的具体 A3 检索后端**（当前 `NO VERIFIED QUERY-PRIVATE RETRIEVAL BACKEND`），否则只能做 A1 因果机制验证或 A2 `QUERY-VISIBLE DIAGNOSTIC`；
-5. （R0.2.1 新增）**为任务 I 与任务 II 分别构造足量独立统计单位**：任务 I 需 ≥ 可划分的主体样本（当前 3 主体中 2 无 QA，NOT_EVALUABLE）；任务 II 需按独立事件簇（非 148 探针记录数）配对，并补上事件—探针关联字段。
+5. （R0.2.1 新增，R0.2.1a 修订）**为任务 I 与任务 II 分别构造足量独立统计单位**：任务 I 需 ≥ 可划分的主体样本（186/186 有静态 `team_id` 标签，但 0 条 Agentic 轨迹，故 `NOT_EVALUABLE`；样本池应基于 186 标签主体而非 3 个变化主体）；任务 II 需按独立事件簇（非 148 探针记录数、非 19 目标键、非 21 时间戳）配对，补上事件—探针关联字段与 pre/post 轨迹；精确独立事件簇数当前 `UNKNOWN`，须在生成轨迹时明确定义并核验。
 
 五项未满足前，实验规格仅为设计，不构成 GO。

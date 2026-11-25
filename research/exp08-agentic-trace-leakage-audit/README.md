@@ -4,13 +4,15 @@
 
 ## 结论摘要
 
-**HOLD**（EXP-02-R0 / R0.1 / R0.2 / R0.2.1 一致，理由逐轮修订）。核心问题尚未被证伪，但当前没有任何单一数据集同时具备「真实 Agentic 多步检索轨迹」和「可信的授权范围 / 权限状态真值」。ASQ 有轨迹无 ACL；Permission-Aware Enterprise RAG Benchmark 有 ACL 时点真值无轨迹。两个数据集不能合法拼接。
+**HOLD**（EXP-02-R0 / R0.1 / R0.2 / R0.2.1 / R0.2.1a 一致，理由逐轮修订）。核心问题尚未被证伪，但当前没有任何单一数据集同时具备「真实 Agentic 多步检索轨迹」和「可信的授权范围 / 权限状态真值」。ASQ 有轨迹无 ACL；Permission-Aware Enterprise RAG Benchmark 有 ACL 时点真值无轨迹。两个数据集不能合法拼接。
 
 **R0.2 修订要点**：独立审查指出 R0.1 初稿有一处逻辑跳步——架构 A（客户端过滤）虽无**直接**过滤结果泄漏，但存在**间接**通道：ACL 改变 Agent 上下文 → 后续自适应检索变化 → 服务端可见轨迹变化。这正是 Agentic RAG 相比单轮检索新增的泄漏面，不能因"混有任务自适应行为"就在实验前排除。架构 C 不再是单一模型——TEE/ORAM/PIR/加密过滤可见性截然不同。
 
 **R0.2.1 修订要点（本轮，重要）**：
 1. **查询隐私执行边界**：源码审计确认 ASQ 默认是 **A1 本地检索**——Agent 明文查询经 `search_pipeline.search(query, qid)` 直传本地 PyTerrier Retriever，全程无网络边界、无外包服务端观察主体。因此"日志不记录明文"不等于"服务端看不到明文"。A2 明文外包只能作 `QUERY-VISIBLE DIAGNOSTIC`；只有经核验的 A3 后端才可能符合查询隐私威胁模型，当前 `NO VERIFIED QUERY-PRIVATE RETRIEVAL BACKEND`。ASQ 的 Agent 生成器可复用，但默认 BM25 检索器**不能直接当隐私保护外包服务**。
 2. **统计独立性勘误**：148 条撤权探针实测为 **1 主体（全 u4）、1 时间点、19 目标组合、无事件关联字段**；49 条 ACL 事件仅 **21 时间戳**且含 20 条继承传播事件；u019/u044 无 golden QA。两类 estimand 分开：任务 I（跨主体推断）`NOT_EVALUABLE`，任务 II（同主体状态变化）按独立事件簇而非探针记录数。禁止 "148 probes + 32 events" 相加当样本量。
+
+**R0.2.1a 修订要点（本轮，统计口径精确化）**：仅修三处统计口径，不改裁决等级、不重审 ASQ 源码、不找后端、不生成轨迹。① 19 个 `(user,doc,canary)` 只是 distinct 目标键，**不是** 19 个独立统计簇（独立簇 `UNKNOWN`）；148 探针 0 事件关联、0 前后轨迹 → 任务 II `NOT_EVALUABLE`。② 49 事件精确独立簇数 `UNKNOWN`，只有 4 组 reason 文本推断的继承链（4 根因×5），21 时间戳 ≠ 21 独立事件。③ 静态角色标签主体为 **186/186**（全部有 `team_id`），3 个 `move_date` 主体只用于角色变化检测；并纠正"组历史为空"的事实错误（全局 14 组共 19 条历史，u4/u019/u044 分别有 8/3/2 条主体级记录）。可评估性硬阻塞仍是"无轨迹 + 无事件关联"，事实勘误不等于可评估性提升。详见 `MINIMAL_EXPERIMENT_DESIGN.md` §7。
 
 修订后的核心研究问题：**在客户端执行 ACL 过滤、Agent 根据授权上下文多步自适应检索的条件下，外包检索服务能否仅凭跨调用可见轨迹推断主体的权限范围或权限状态变化？**（待检验假设，非已成立创新点。）
 
@@ -33,8 +35,8 @@ research/exp08-agentic-trace-leakage-audit/
 ├── DECISION.md                 R0：GO/HOLD/NO-GO 与阻塞项
 ├── AGENT_GENERATION_AUDIT.md   R0.1 Phase 3：源码可行性 + R0.2.1「Query Privacy and Execution Boundary Audit」章节
 ├── OBSERVABILITY_AUDIT.md      R0.1 Phase 4：三种 ACL 架构可见性 + R0.2.1 §4.3 执行模型对齐
-├── MINIMAL_EXPERIMENT_DESIGN.md R0.1 Phase 5：实验规格 + R0.2.1 §6 两类 estimand / §7 统计独立性审计
-├── R0_1_DECISION.md            R0.1 Phase 6：裁决（R0.2.1 三层状态修订）
+├── MINIMAL_EXPERIMENT_DESIGN.md R0.1 Phase 5：实验规格 + R0.2.1 §6 两类 estimand / §7 统计独立性审计（R0.2.1a §7.1–7.6 口径修订）
+├── R0_1_DECISION.md            R0.1 Phase 6：裁决（R0.2.1a 三层状态修订）
 ├── evidence/
 │   ├── sources.md              原始来源、核验日期、状态
 │   ├── claims_and_evidence.md  结论—原始证据—核验方法—状态
