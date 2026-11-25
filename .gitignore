@@ -1,6 +1,9 @@
 .venv/
 .deps/
 build/
+data/fiqa/
+data/exp10_fiqa_embeddings/
+results/raw/exp10_fiqa_*.bin
 __pycache__/
 *.py[cod]
 .pytest_cache/
