@@ -1,0 +1,358 @@
+{
+  "cardinality_rule": "ceil(selectivity * N)",
+  "corpus_count": 57638,
+  "experiment": "EXP-10B.2",
+  "files": {
+    "cluster3_filtered_gt.json": {
+      "path": "results/exp10b2/cluster3_filtered_gt.json",
+      "sha256": "894f16a2a4634e0f8289b75ba44293e6b554d0a7971087dfc9853eb9dbe9e18f",
+      "size_bytes": 1046400
+    }
+  },
+  "k": 10,
+  "mask_variants": {
+    "clustered_128_random_direction": {
+      "cardinality_rule": "round(selectivity * N)",
+      "old_name_in_exp10b1": "clustered",
+      "overwritten": false,
+      "sha256_by_mask_key": {
+        "clustered_s2026_p01": "1f0518facdcdc2bc80cf59a90869a44f1f49a8220866c69db209abca95ec2c62",
+        "clustered_s2026_p10": "84077dd1932c030b5973708e0703f9a2613184c2ac14212a6196c337d96f0d48",
+        "clustered_s2026_p30": "4027d60bfa060e8c0a955fc66bb0d19e763b68a4f3a6a465aa230dc50b814ba9",
+        "clustered_s2027_p01": "0fb7a1bbabd36472997c936ccb951b9aac279c81eceb9220eb13d94ed64920ed",
+        "clustered_s2027_p10": "4848e74e24e29833ce423366825e518edc3bca7db793275ebf83058c0260b080",
+        "clustered_s2027_p30": "74dd46b87844c16984fc6c16956a37875bf00cded2bcc4c513514389cb540a59",
+        "clustered_s2028_p01": "d20b0b5dcb29152d4f6704858fd0c6ec05edd9d8a371151557bb20aaddeacb0e",
+        "clustered_s2028_p10": "bcd89b77bbe064d5e245e0d3bb6890f5d7e81e9a8883685da945170419eb688a",
+        "clustered_s2028_p30": "5e762000f93b1de8835d24063c2471d97ec2dfa831024aba5632d3fcdd62bcc4"
+      }
+    },
+    "clustered_3center_farthest_first": {
+      "assignment": "nearest center by maximum dot product on normalized embeddings; earlier center in selection order breaks ties",
+      "cardinality_rule": "ceil(selectivity * N)",
+      "centers": 3,
+      "cluster_order": "farthest-first center selection order",
+      "initial_center": "numpy.default_rng(seed).choice(N); deterministic by seed",
+      "name": "clustered_3center_farthest_first",
+      "no_query_content": true,
+      "partial_cluster": "sort cluster docs by squared Euclidean distance to its center ascending, then corpus row index ascending",
+      "seeds": [
+        2026,
+        2027,
+        2028
+      ],
+      "subsequent_centers": "farthest-first by maximum minimum squared Euclidean distance to selected centers; smallest corpus row index breaks ties"
+    }
+  },
+  "masks": {
+    "cluster3_s2026_p01": {
+      "authorized_docs": 577,
+      "mask_key": "cluster3_s2026_p01",
+      "mask_type": "clustered_3center_farthest_first",
+      "path": "results/exp10b2/masks/mask_cluster3_s2026_p01.npy",
+      "rule": {
+        "assignment": "max dot product on normalized embeddings; ties -> earliest center in selection order",
+        "center_selection": "farthest-first; initial row = default_rng(seed).choice(N); ties -> smallest row index",
+        "centers": [
+          49099,
+          40090,
+          30894
+        ],
+        "cluster_order": "farthest-first center selection order",
+        "cluster_sizes": [
+          22150,
+          26572,
+          8916
+        ],
+        "partial_cluster": "distance squared to center ascending; ties -> smallest corpus row index",
+        "partial_details": [
+          {
+            "center_row": 49099,
+            "cluster_order": 0,
+            "cluster_size": 22150,
+            "taken": 577
+          }
+        ]
+      },
+      "seed": 2026,
+      "selectivity": 0.01,
+      "sha256": "943b7dd88587287e31cff22a5522aeb1b4a04f2f42c9978ea12247951814255f"
+    },
+    "cluster3_s2026_p10": {
+      "authorized_docs": 5764,
+      "mask_key": "cluster3_s2026_p10",
+      "mask_type": "clustered_3center_farthest_first",
+      "path": "results/exp10b2/masks/mask_cluster3_s2026_p10.npy",
+      "rule": {
+        "assignment": "max dot product on normalized embeddings; ties -> earliest center in selection order",
+        "center_selection": "farthest-first; initial row = default_rng(seed).choice(N); ties -> smallest row index",
+        "centers": [
+          49099,
+          40090,
+          30894
+        ],
+        "cluster_order": "farthest-first center selection order",
+        "cluster_sizes": [
+          22150,
+          26572,
+          8916
+        ],
+        "partial_cluster": "distance squared to center ascending; ties -> smallest corpus row index",
+        "partial_details": [
+          {
+            "center_row": 49099,
+            "cluster_order": 0,
+            "cluster_size": 22150,
+            "taken": 5764
+          }
+        ]
+      },
+      "seed": 2026,
+      "selectivity": 0.1,
+      "sha256": "8c174ce15ef9c298632c3632532148498030b9688784a74bf744558e82ff37a5"
+    },
+    "cluster3_s2026_p30": {
+      "authorized_docs": 17292,
+      "mask_key": "cluster3_s2026_p30",
+      "mask_type": "clustered_3center_farthest_first",
+      "path": "results/exp10b2/masks/mask_cluster3_s2026_p30.npy",
+      "rule": {
+        "assignment": "max dot product on normalized embeddings; ties -> earliest center in selection order",
+        "center_selection": "farthest-first; initial row = default_rng(seed).choice(N); ties -> smallest row index",
+        "centers": [
+          49099,
+          40090,
+          30894
+        ],
+        "cluster_order": "farthest-first center selection order",
+        "cluster_sizes": [
+          22150,
+          26572,
+          8916
+        ],
+        "partial_cluster": "distance squared to center ascending; ties -> smallest corpus row index",
+        "partial_details": [
+          {
+            "center_row": 49099,
+            "cluster_order": 0,
+            "cluster_size": 22150,
+            "taken": 17292
+          }
+        ]
+      },
+      "seed": 2026,
+      "selectivity": 0.3,
+      "sha256": "4842b73204e2e297a1bd5bebb00c8bab34e3f82a7aeec3df26ea60276dcde244"
+    },
+    "cluster3_s2027_p01": {
+      "authorized_docs": 577,
+      "mask_key": "cluster3_s2027_p01",
+      "mask_type": "clustered_3center_farthest_first",
+      "path": "results/exp10b2/masks/mask_cluster3_s2027_p01.npy",
+      "rule": {
+        "assignment": "max dot product on normalized embeddings; ties -> earliest center in selection order",
+        "center_selection": "farthest-first; initial row = default_rng(seed).choice(N); ties -> smallest row index",
+        "centers": [
+          36438,
+          4246,
+          36842
+        ],
+        "cluster_order": "farthest-first center selection order",
+        "cluster_sizes": [
+          30389,
+          16011,
+          11238
+        ],
+        "partial_cluster": "distance squared to center ascending; ties -> smallest corpus row index",
+        "partial_details": [
+          {
+            "center_row": 36438,
+            "cluster_order": 0,
+            "cluster_size": 30389,
+            "taken": 577
+          }
+        ]
+      },
+      "seed": 2027,
+      "selectivity": 0.01,
+      "sha256": "575aef843e57bc670162185a31f3aaf4b467a2c8d489f979abdbfea06426b8c8"
+    },
+    "cluster3_s2027_p10": {
+      "authorized_docs": 5764,
+      "mask_key": "cluster3_s2027_p10",
+      "mask_type": "clustered_3center_farthest_first",
+      "path": "results/exp10b2/masks/mask_cluster3_s2027_p10.npy",
+      "rule": {
+        "assignment": "max dot product on normalized embeddings; ties -> earliest center in selection order",
+        "center_selection": "farthest-first; initial row = default_rng(seed).choice(N); ties -> smallest row index",
+        "centers": [
+          36438,
+          4246,
+          36842
+        ],
+        "cluster_order": "farthest-first center selection order",
+        "cluster_sizes": [
+          30389,
+          16011,
+          11238
+        ],
+        "partial_cluster": "distance squared to center ascending; ties -> smallest corpus row index",
+        "partial_details": [
+          {
+            "center_row": 36438,
+            "cluster_order": 0,
+            "cluster_size": 30389,
+            "taken": 5764
+          }
+        ]
+      },
+      "seed": 2027,
+      "selectivity": 0.1,
+      "sha256": "50b8102ac150d5d9b11ae12149df3803d5edc0733ca5710e44c98f77ff6cf235"
+    },
+    "cluster3_s2027_p30": {
+      "authorized_docs": 17292,
+      "mask_key": "cluster3_s2027_p30",
+      "mask_type": "clustered_3center_farthest_first",
+      "path": "results/exp10b2/masks/mask_cluster3_s2027_p30.npy",
+      "rule": {
+        "assignment": "max dot product on normalized embeddings; ties -> earliest center in selection order",
+        "center_selection": "farthest-first; initial row = default_rng(seed).choice(N); ties -> smallest row index",
+        "centers": [
+          36438,
+          4246,
+          36842
+        ],
+        "cluster_order": "farthest-first center selection order",
+        "cluster_sizes": [
+          30389,
+          16011,
+          11238
+        ],
+        "partial_cluster": "distance squared to center ascending; ties -> smallest corpus row index",
+        "partial_details": [
+          {
+            "center_row": 36438,
+            "cluster_order": 0,
+            "cluster_size": 30389,
+            "taken": 17292
+          }
+        ]
+      },
+      "seed": 2027,
+      "selectivity": 0.3,
+      "sha256": "118dade827086e26c964535a8a12b4b95e971c748619735537bc7deea3252806"
+    },
+    "cluster3_s2028_p01": {
+      "authorized_docs": 577,
+      "mask_key": "cluster3_s2028_p01",
+      "mask_type": "clustered_3center_farthest_first",
+      "path": "results/exp10b2/masks/mask_cluster3_s2028_p01.npy",
+      "rule": {
+        "assignment": "max dot product on normalized embeddings; ties -> earliest center in selection order",
+        "center_selection": "farthest-first; initial row = default_rng(seed).choice(N); ties -> smallest row index",
+        "centers": [
+          32589,
+          18083,
+          9231
+        ],
+        "cluster_order": "farthest-first center selection order",
+        "cluster_sizes": [
+          10789,
+          36094,
+          10755
+        ],
+        "partial_cluster": "distance squared to center ascending; ties -> smallest corpus row index",
+        "partial_details": [
+          {
+            "center_row": 32589,
+            "cluster_order": 0,
+            "cluster_size": 10789,
+            "taken": 577
+          }
+        ]
+      },
+      "seed": 2028,
+      "selectivity": 0.01,
+      "sha256": "e44362a6e532264ce879b92a4821c64478e8b6e747da598cde7de1fc49aa95d1"
+    },
+    "cluster3_s2028_p10": {
+      "authorized_docs": 5764,
+      "mask_key": "cluster3_s2028_p10",
+      "mask_type": "clustered_3center_farthest_first",
+      "path": "results/exp10b2/masks/mask_cluster3_s2028_p10.npy",
+      "rule": {
+        "assignment": "max dot product on normalized embeddings; ties -> earliest center in selection order",
+        "center_selection": "farthest-first; initial row = default_rng(seed).choice(N); ties -> smallest row index",
+        "centers": [
+          32589,
+          18083,
+          9231
+        ],
+        "cluster_order": "farthest-first center selection order",
+        "cluster_sizes": [
+          10789,
+          36094,
+          10755
+        ],
+        "partial_cluster": "distance squared to center ascending; ties -> smallest corpus row index",
+        "partial_details": [
+          {
+            "center_row": 32589,
+            "cluster_order": 0,
+            "cluster_size": 10789,
+            "taken": 5764
+          }
+        ]
+      },
+      "seed": 2028,
+      "selectivity": 0.1,
+      "sha256": "204c854dc261bddc34fbe4d457020fc39abaa44f93ec7b4daf1f4156100d0c68"
+    },
+    "cluster3_s2028_p30": {
+      "authorized_docs": 17292,
+      "mask_key": "cluster3_s2028_p30",
+      "mask_type": "clustered_3center_farthest_first",
+      "path": "results/exp10b2/masks/mask_cluster3_s2028_p30.npy",
+      "rule": {
+        "assignment": "max dot product on normalized embeddings; ties -> earliest center in selection order",
+        "center_selection": "farthest-first; initial row = default_rng(seed).choice(N); ties -> smallest row index",
+        "centers": [
+          32589,
+          18083,
+          9231
+        ],
+        "cluster_order": "farthest-first center selection order",
+        "cluster_sizes": [
+          10789,
+          36094,
+          10755
+        ],
+        "partial_cluster": "distance squared to center ascending; ties -> smallest corpus row index",
+        "partial_details": [
+          {
+            "center_row": 18083,
+            "cluster_order": 1,
+            "cluster_size": 36094,
+            "taken": 6503
+          }
+        ]
+      },
+      "seed": 2028,
+      "selectivity": 0.3,
+      "sha256": "176a1962d5519cf395a0c73b18164cadbcbf7865281c6d0c07183c68fbacaf11"
+    }
+  },
+  "original_zip_md5_status": "NOT_VERIFIED",
+  "query_count": 648,
+  "sizes": {
+    "0.01": 577,
+    "0.1": 5764,
+    "0.3": 17292
+  },
+  "source_embeddings": {
+    "path": "data/exp10_fiqa_embeddings/corpus.f32",
+    "regenerated": false,
+    "sha256": "65bb89ba7993b484f8a7523bbaeb14cf79342d2aac2f33e7e50765ed6e768501"
+  }
+}

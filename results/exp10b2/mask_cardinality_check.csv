@@ -1,0 +1,7 @@
+pair,left_mask_type,right_mask_type,selectivity,left_cardinalities,right_cardinalities,cardinality_matched,reason
+random_vs_clustered_128_random_direction,random,clustered_128_random_direction,0.01,[576],[576],True,MATCHED
+random_vs_clustered_128_random_direction,random,clustered_128_random_direction,0.1,[5764],[5764],True,MATCHED
+random_vs_clustered_128_random_direction,random,clustered_128_random_direction,0.3,[17291],[17291],True,MATCHED
+random_vs_clustered_3center_farthest_first,random,clustered_3center_farthest_first,0.01,[576],[577],False,CARDINALITY_MISMATCH
+random_vs_clustered_3center_farthest_first,random,clustered_3center_farthest_first,0.1,[5764],[5764],True,MATCHED
+random_vs_clustered_3center_farthest_first,random,clustered_3center_farthest_first,0.3,[17291],[17292],False,CARDINALITY_MISMATCH

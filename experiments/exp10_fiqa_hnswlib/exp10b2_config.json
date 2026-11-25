@@ -1,0 +1,76 @@
+{
+  "experiment": "EXP-10B.2",
+  "principle": "FIX_CALCULATION_BEFORE_REINTERPRETING_RESULTS",
+  "baseline_commit": "69c4bd05e48f8734bc46e290ecb726320c572b45",
+  "branch": "exp10-fiqa-statistical-correction",
+  "oracle": {
+    "not_reached_encoding": "EMPTY_CELL",
+    "forbidden_fillers": ["B", "1.0", "full_trace_ratio"],
+    "summary_groups": ["ef_search", "mask_type", "selectivity", "delta"],
+    "reached_only_statistics": ["count", "mean", "median", "p90", "bootstrap_ci"],
+    "not_reached_reporting": "full_trace_recall_at_10 distribution",
+    "semantics": "POST_HOC_TRACE_ANALYSIS_NOT_ONLINE_STOPPING_RULE"
+  },
+  "bootstrap": {
+    "unit": "query_id",
+    "cluster_membership": "all mask_type x selectivity x seed x efSearch observations for the same qid",
+    "resamples": 2000,
+    "seed": 20261125,
+    "ci": "95% percentile",
+    "forbidden": "independent resampling of expanded query-mask rows"
+  },
+  "paired_differences": {
+    "align_keys": ["qid", "selectivity", "seed", "ef_search"],
+    "direction": "clustered_minus_random",
+    "cardinality_check_required": true,
+    "unmatched_policy": "REPORT_UNPAIRABLE_REASON_NO_PSEUDO_PAIRED_TEST"
+  },
+  "ndcg": {
+    "candidate_source": "prefix unique first-touch candidate set",
+    "authorized_filter": "keep only candidates allowed by the mask",
+    "ranking": "exact cosine similarity descending; corpus row id ascending as deterministic tie-break",
+    "truncate": 10,
+    "gain_source": "qrels score; missing qrels gain=0",
+    "idcg": "full authorized qrels ranked by relevance descending",
+    "no_relevant_qrels_convention": 0.0,
+    "secondary_metric_only": true
+  },
+  "mask_variants": {
+    "renamed_legacy": {
+      "old_name": "clustered",
+      "new_name": "clustered_128_random_direction",
+      "cardinality_rule": "round(selectivity * N)",
+      "do_not_overwrite_original": true
+    },
+    "new_three_center": {
+      "name": "clustered_3center_farthest_first",
+      "centers": 3,
+      "initial_center": "numpy.default_rng(seed).choice(N); deterministic by seed",
+      "subsequent_centers": "farthest-first by maximum minimum squared Euclidean distance to selected centers; smallest corpus row index breaks ties",
+      "assignment": "nearest center by maximum dot product on normalized embeddings; earlier center in selection order breaks ties",
+      "cluster_order": "farthest-first center selection order",
+      "partial_cluster": "sort cluster docs by squared Euclidean distance to its center ascending, then corpus row index ascending",
+      "cardinality_rule": "ceil(selectivity * N)",
+      "seeds": [2026, 2027, 2028],
+      "no_query_content": true
+    }
+  },
+  "recompute_scope": {
+    "recompute": [
+      "oracle_reachability",
+      "oracle_reached_only_statistics",
+      "cluster_bootstrap_ci",
+      "paired_mask_differences",
+      "ndcg_at_10",
+      "three_center_mask_prefix_recall",
+      "three_center_mask_oracle_statistics"
+    ],
+    "do_not_recompute": [
+      "embedding",
+      "hnsw_index",
+      "raw_hnsw_trace",
+      "unfiltered_topk",
+      "unfiltered_recall"
+    ]
+  }
+}
