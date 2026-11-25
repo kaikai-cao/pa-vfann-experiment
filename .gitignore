@@ -2,8 +2,12 @@
 .deps/
 build/
 data/fiqa/
+data/exp10_component_sources/
+data/exp10_fiqa_extracted/
 data/exp10_fiqa_embeddings/
 results/raw/exp10_fiqa_*.bin
+results/raw/exp10_fiqa_*.jsonl
+results/raw/exp10_fiqa_*.npz
 __pycache__/
 *.py[cod]
 .pytest_cache/

@@ -1,0 +1,90 @@
+{
+  "experiment": "EXP-10B.1",
+  "amendment": "BEIR first-party component artifacts, revision-pinned",
+  "original_zip_md5": {
+    "value": "17918ed23cd04fb15047f73e6c3bd9d9",
+    "status": "NOT_VERIFIED"
+  },
+  "data_gate_verdict_vocabulary": [
+    "PASS_COMPONENT_ARTIFACTS",
+    "STOP_PRE_REGISTERED_DATA_GATE"
+  ],
+  "data_sources": {
+    "corpus": {
+      "repo_id": "BeIR/fiqa",
+      "revision": "a90551af496e20ce7887c02f07f7ea5c86908fb9",
+      "filename": "corpus.jsonl.gz",
+      "expected_size_bytes": 17662437,
+      "expected_sha256": "6d2c7e27aeb8c646791178e3e5591a373813642f38d9c992c0a4f6cbf4092f72"
+    },
+    "queries": {
+      "repo_id": "BeIR/fiqa",
+      "revision": "01557ca93ac1c5f4ba52cd6955bc44515846f3fa",
+      "filename": "queries.jsonl.gz",
+      "expected_size_bytes": 193723,
+      "expected_sha256": "a683bbedd2fd3b1fcb1a44fbd706daf9aff27291cd99e7a086b3cf7624785acb"
+    },
+    "qrels": {
+      "repo_id": "BeIR/fiqa-qrels",
+      "revision": "93a4617fe9d8263f8055a67a2269eb40b8659c0a",
+      "filename": "test.tsv",
+      "expected_size_bytes": null,
+      "expected_sha256": null
+    }
+  },
+  "expected_counts": {
+    "corpus": 57638,
+    "queries_all_splits": 6648,
+    "queries_test": 648,
+    "qrels_pairs": 1706
+  },
+  "model": {
+    "name": "sentence-transformers/all-MiniLM-L6-v2",
+    "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+    "device": "cpu",
+    "dtype": "float32",
+    "dim": 384,
+    "normalize_embeddings": true
+  },
+  "hnsw": {
+    "library": "hnswlib",
+    "version": "v0.9.0",
+    "instrumentation": "EXP-10A patch",
+    "M": 32,
+    "ef_construction": 200,
+    "ef_search": [64, 128, 256],
+    "k": 10,
+    "seed": 2026,
+    "threads": 1,
+    "space": "cosine-equivalent inner product on normalized float32"
+  },
+  "masks": {
+    "types": ["random", "embedding-clustered"],
+    "selectivities": [0.01, 0.10, 0.30],
+    "seeds": [2026, 2027, 2028],
+    "count": 18
+  },
+  "prefixes": {
+    "budget_fractions": [0.60, 0.80, 0.90, 1.00],
+    "oracle_delta": [0.05, 0.10],
+    "trace_view": "unique first-touch"
+  },
+  "statistics": {
+    "method": "query-level paired bootstrap over query IDs",
+    "resamples": 2000,
+    "seed": 20261125,
+    "ci": "95% percentile"
+  },
+  "recall_gate": {
+    "rule": "STOP_ORACLE_ONLY_IF_ALL_EFSEARCH_MEAN_UNFILTERED_EXACT_RECALL10_BELOW_0_90",
+    "threshold": 0.90,
+    "ef_search_values": [64, 128, 256],
+    "written_before_viewing_baseline": true,
+    "low_quality_label": "LOW_QUALITY_CONFIG"
+  },
+  "stop_after_experiment": {
+    "start_exp11": false,
+    "add_dataset": false,
+    "agent_rag_claim": false
+  }
+}
