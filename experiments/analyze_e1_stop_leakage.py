@@ -20,6 +20,7 @@ from __future__ import annotations
 import hashlib
 import sys
 from collections import Counter
+from numbers import Integral
 from pathlib import Path
 from typing import Sequence
 
@@ -68,6 +69,37 @@ def prefix_hash(public_path: Sequence[int], tau: int) -> str:
     return hashlib.sha256(
         ",".join(str(int(v)) for v in public_path[: int(tau)]).encode("ascii")
     ).hexdigest()[:16]
+
+
+def _baseline_int(name: str, value: object) -> int:
+    if isinstance(value, bool) or not isinstance(value, Integral):
+        raise TypeError(f"{name} must be an integer")
+    return int(value)
+
+
+def random_baselines(u: int, m: int, n: int) -> dict[str, float]:
+    """Theoretical random-guessing baselines for H1.1 metrics.
+
+    ``u`` is the number of distinct inferred nodes (after de-duplication),
+    ``m`` is the authorized-set size, and ``n`` is the total node count.
+
+    A uniformly random distinct-node guess has precision expectation ``M/N``
+    and coverage expectation ``U/N``. Both are analytic references, not
+    independently measured random-attack results.
+    """
+    u_i = _baseline_int("U", u)
+    m_i = _baseline_int("M", m)
+    n_i = _baseline_int("N", n)
+    if n_i <= 0:
+        raise ValueError("N must be positive")
+    if m_i <= 0 or m_i > n_i:
+        raise ValueError("M must satisfy 0 < M <= N")
+    if u_i < 0 or u_i > n_i:
+        raise ValueError("U must satisfy 0 <= U <= N")
+    return {
+        "random_precision_baseline": m_i / n_i,
+        "random_coverage_baseline": u_i / n_i,
+    }
 
 
 # --------------------------------------------------------------------------- #
@@ -187,7 +219,6 @@ def run_audit(ctx: dict[str, object]) -> dict[str, object]:
             "n": actual,
             "N": n,
             "mask": mask,
-            "random_baseline": actual / n,
             "total": len(gdf),
             "excluded_m": 0,
             "excluded_B": 0,
@@ -263,7 +294,14 @@ def run_audit(ctx: dict[str, object]) -> dict[str, object]:
         events = int(b["positive_events"])
         acl = int(b["n"])
         group_mask = b["mask"]
-        covered = len(unique_nodes & set(int(v) for v in group_mask.nonzero()[0]))
+        authorized_nodes = {int(v) for v in group_mask.nonzero()[0]}
+        if not unique_nodes <= authorized_nodes:
+            raise RuntimeError(
+                "unique inferred nodes contain a non-authorized node; "
+                "coverage/precision baseline definitions would be invalid"
+            )
+        u = len(unique_nodes)
+        baselines = random_baselines(u, acl, int(b["N"]))
         summary.append(
             {
                 "policy_type": policy_type,
@@ -273,12 +311,13 @@ def run_audit(ctx: dict[str, object]) -> dict[str, object]:
                 "excluded_tau_eq_B": int(b["excluded_B"]),
                 "informative_queries": int(b["informative"]),
                 "positive_events": events,
-                "unique_inferred_nodes": len(unique_nodes),
+                "unique_inferred_nodes": u,
                 "precision": (int(b["correct_events"]) / events) if events else None,
-                "acl_coverage": (covered / acl) if acl else None,
+                "acl_coverage": (u / acl) if acl else None,
                 "repeat_nodes": sum(1 for c in counts.values() if c > 1),
                 "repeat_events": sum(c - 1 for c in counts.values() if c > 1),
-                "random_baseline": float(b["random_baseline"]),
+                "random_precision_baseline": baselines["random_precision_baseline"],
+                "random_coverage_baseline": baselines["random_coverage_baseline"],
                 "lemma_ok_events": int(b["lemma_ok"]),
                 "authorized_docs": acl,
             }
@@ -290,7 +329,7 @@ def print_report(summary: list[dict[str, object]]) -> None:
     print("\n=== E1 stop-boundary leakage (budget=1000) ===")
     header = (
         "policy | sel% | total | tau=m | tau=B | inform | events | unique | "
-        "precision | ACLcov | repeat_nodes | random | lemma_ok"
+        "precision | ACLcov | repeat_nodes | rand_prec | rand_cov | lemma_ok"
     )
     print(header)
     for r in summary:
@@ -300,7 +339,8 @@ def print_report(summary: list[dict[str, object]]) -> None:
             f"{r['informative_queries']:>6} | {r['positive_events']:>6} | "
             f"{r['unique_inferred_nodes']:>6} | {r['precision']} | "
             f"{r['acl_coverage']:.4f} | {r['repeat_nodes']:>11} | "
-            f"{r['random_baseline']:.4f} | {r['lemma_ok_events']:>8}"
+            f"{r['random_precision_baseline']:.4f} | "
+            f"{r['random_coverage_baseline']:.4f} | {r['lemma_ok_events']:>8}"
         )
 
 

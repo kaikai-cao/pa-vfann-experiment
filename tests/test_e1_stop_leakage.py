@@ -11,6 +11,8 @@ import inspect
 import sys
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT))
@@ -22,6 +24,7 @@ from experiments.analyze_e1_stop_leakage import (  # noqa: E402
     evaluate_inference,
     infer_last_node,
     prefix_hash,
+    random_baselines,
     recompute_stop_position,
 )
 
@@ -86,3 +89,37 @@ def test_out_of_range_tau_returns_none():
 def test_evaluator_reports_none_for_uninformative_boundary():
     verdict = evaluate_inference((1, 2, 3), MIN_VISITS, [False] * 3, None)
     assert verdict == {"inferred_authorized": None, "prefix_count": None, "lemma_holds": None}
+
+
+def test_random_baselines_use_distinct_precision_and_coverage_denominators():
+    baselines = random_baselines(u=53, m=100, n=10000)
+    assert baselines["random_precision_baseline"] == pytest.approx(0.01)
+    assert baselines["random_coverage_baseline"] == pytest.approx(0.0053)
+
+
+def test_coverage_ratio_is_the_deterministic_inverse_selectivity():
+    baselines = random_baselines(u=53, m=100, n=10000)
+    deterministic_coverage = 53 / 100
+    assert (
+        deterministic_coverage / baselines["random_coverage_baseline"]
+        == pytest.approx(100.0)
+    )
+
+
+@pytest.mark.parametrize(
+    ("u", "m", "n", "expected_error"),
+    [
+        (-1, 100, 10000, ValueError),
+        (10001, 100, 10000, ValueError),
+        (53, 0, 10000, ValueError),
+        (53, 10001, 10000, ValueError),
+        (53, 100, 0, ValueError),
+        (53.0, 100, 10000, TypeError),
+        (53, 100.0, 10000, TypeError),
+        (53, 100, 10000.0, TypeError),
+        (True, 100, 10000, TypeError),
+    ],
+)
+def test_random_baselines_reject_invalid_inputs(u, m, n, expected_error):
+    with pytest.raises(expected_error):
+        random_baselines(u=u, m=m, n=n)
