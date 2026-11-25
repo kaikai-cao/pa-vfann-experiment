@@ -1,0 +1,48 @@
+{
+  "decision": "PASS",
+  "checks": {
+    "c0_c1_top10_count": true,
+    "c0_c1_top10_external_id": true,
+    "c0_c1_top10_float32_bits": true,
+    "topk_channels_identical_C0": true,
+    "topk_channels_identical_C1": true,
+    "topk_channels_identical_C2": true,
+    "sink_off_no_events": true,
+    "upstream_no_events": true,
+    "group_count_150": true,
+    "event_count_consistent": true,
+    "c0_c1_dist_eval_len_equal": true,
+    "c0_c1_dist_eval_seq_identical": true,
+    "all_eight_event_types_present": true,
+    "c0_c1_event_counts_identical": true,
+    "c2_khit_count_accurate": true,
+    "c2_one_stop_per_query": true,
+    "c2_khit_before_stop": true,
+    "c2_stop_boundary_lag_positive": true
+  },
+  "metrics": {
+    "c0_c1_top10_cells": 500,
+    "c0_c1_top10_id_matches": 500,
+    "c0_c1_top10_bits_matches": 500,
+    "c0_c1_distance_eval_events_each": 50998,
+    "c2_gap_mean": 27.58,
+    "c2_gap_min": 3,
+    "c2_gap_max": 52,
+    "c2_auth_hits_min": 10,
+    "c2_auth_hits_max": 14,
+    "c2_returned_size_min": 10,
+    "c2_returned_size_max": 14,
+    "c0_returned_size": 10,
+    "c1_returned_size": 64,
+    "c2_events_between_khit_and_stop": {
+      "distance_eval": 398,
+      "candidate_pop": 0,
+      "candidate_consider": 398,
+      "filter_check": 398,
+      "result_add": 85,
+      "result_remove": 0,
+      "stop_check": 50,
+      "search_stop": 0
+    }
+  }
+}

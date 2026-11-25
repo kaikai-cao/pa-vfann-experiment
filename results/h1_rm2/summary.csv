@@ -1,0 +1,4 @@
+group,queries,mean_returned_size,mean_auth_hits,mean_event_count
+C0,50,10.0,76.88,4109.68
+C1,50,64.0,76.88,4109.68
+C2,50,10.7,10.7,342.78

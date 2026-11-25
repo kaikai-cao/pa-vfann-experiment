@@ -1,0 +1,95 @@
+{
+  "task": "H1-RM.2 Native HNSW Filter/Stop Semantics",
+  "baseline_exp10a_commit": "68ed142a234428bafc85be5cbad8de12371688f2",
+  "upstream_hnswlib_commit": "d9b3608c83d83b46c96e25088cb1d729b29dcfe9",
+  "config": {
+    "N": 1000,
+    "dim": 16,
+    "space": "inner_product",
+    "M": 16,
+    "ef_construction": 200,
+    "ef_search": 64,
+    "ef_rule": 64,
+    "k": 10,
+    "queries": 50,
+    "seed": 2026,
+    "label_base": 100000,
+    "label_step": 17,
+    "authorized_nodes": 100,
+    "auth_rule": "hash(label)*odd >>15 %100 <10"
+  },
+  "groups": {
+    "C0": "searchKnn(q,10,filter) standard path, ef=max(ef_,k)=64",
+    "C1": "searchStopConditionClosest + EfReplayStopCondition (ef=64, real result set)",
+    "C2": "C1 + K-hit stop (K=10 authorized filter passes)"
+  },
+  "decision": "PASS",
+  "checks": {
+    "c0_c1_top10_count": true,
+    "c0_c1_top10_external_id": true,
+    "c0_c1_top10_float32_bits": true,
+    "topk_channels_identical_C0": true,
+    "topk_channels_identical_C1": true,
+    "topk_channels_identical_C2": true,
+    "sink_off_no_events": true,
+    "upstream_no_events": true,
+    "group_count_150": true,
+    "event_count_consistent": true,
+    "c0_c1_dist_eval_len_equal": true,
+    "c0_c1_dist_eval_seq_identical": true,
+    "all_eight_event_types_present": true,
+    "c0_c1_event_counts_identical": true,
+    "c2_khit_count_accurate": true,
+    "c2_one_stop_per_query": true,
+    "c2_khit_before_stop": true,
+    "c2_stop_boundary_lag_positive": true
+  },
+  "metrics": {
+    "c0_c1_top10_cells": 500,
+    "c0_c1_top10_id_matches": 500,
+    "c0_c1_top10_bits_matches": 500,
+    "c0_c1_distance_eval_events_each": 50998,
+    "c2_gap_mean": 27.58,
+    "c2_gap_min": 3,
+    "c2_gap_max": 52,
+    "c2_auth_hits_min": 10,
+    "c2_auth_hits_max": 14,
+    "c2_returned_size_min": 10,
+    "c2_returned_size_max": 14,
+    "c0_returned_size": 10,
+    "c1_returned_size": 64,
+    "c2_events_between_khit_and_stop": {
+      "distance_eval": 398,
+      "candidate_pop": 0,
+      "candidate_consider": 398,
+      "filter_check": 398,
+      "result_add": 85,
+      "result_remove": 0,
+      "stop_check": 50,
+      "search_stop": 0
+    }
+  },
+  "files": {
+    "events_audit.jsonl": "d4561122d379bba67bff5ddb836fe46cbcd6f1618ec9048afb0a514020e9b2a3",
+    "trace_on/topk.jsonl": "69fc51eaea4b8c6a73973bcd8b1e1cb085451f7432a55d5c3bce4903da2811c8",
+    "trace_on/run_summary.jsonl": "d64f952bffa7ba6a8beb947a72457e78a1b7e26c27d231bb9665933e630d01a8",
+    "trace_off/topk.jsonl": "69fc51eaea4b8c6a73973bcd8b1e1cb085451f7432a55d5c3bce4903da2811c8",
+    "trace_off/run_summary.jsonl": "3b416dfeb5fb2bcefb834320128a18b481091e26dab098eaef4cbf34a05b3c40",
+    "upstream/topk.jsonl": "69fc51eaea4b8c6a73973bcd8b1e1cb085451f7432a55d5c3bce4903da2811c8",
+    "upstream/run_summary.jsonl": "3b416dfeb5fb2bcefb834320128a18b481091e26dab098eaef4cbf34a05b3c40",
+    "gate.json": "f942003b645aa634f3e9e60bbe7cd213872640a70a636ec952459ee9c8c65a74",
+    "summary.csv": "764331bff48c36683133f8cd0d872e07a75dccacb3a542a0e5e0c225eacd4cf7"
+  },
+  "full_event_log": {
+    "path": "trace_on/events.jsonl",
+    "sha256": "9efcb897298948d23f2f734e9dd29c5eec2a6d4812cbba9af24327e614bb7ccc",
+    "lines": 428107,
+    "gitignored": true,
+    "note": "Full 428107-event raw log; regenerate via build_and_run.sh. events_audit.jsonl is the committed, sufficient audit subset."
+  },
+  "source_hashes": {
+    "pristine_hnswalg": "7e5eb7f353c71ed71b3900eff9a47c7a478ed7ca92264f5a6bce4a700614bc43",
+    "rm2_hnswalg": "f686c57950657da4a18a3d25bf9e77034fd44117b1fb723b41f848daa1e64e72",
+    "rm2_sink": "ffb4eccfc434ffeaf005e32a54fb64cfff127b24f5fe01edead6d7c21669664a"
+  }
+}

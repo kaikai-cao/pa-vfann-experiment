@@ -5,3 +5,7 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 *.egg-info/
+
+# H1-RM.2 full raw event log (67MB, regenerable); committed audit subset is
+# results/h1_rm2/events_audit.jsonl
+results/h1_rm2/trace_on/events.jsonl
