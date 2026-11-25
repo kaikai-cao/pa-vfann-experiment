@@ -4,6 +4,8 @@
 
 > **H1-RM.3A.3-R1（ACL 秘密性与评估独立性勘误）**：本轮在原冻结文档上做两处设计修正，**裁决 CONDITIONAL 原样保留、不进入 H1-RM.3B**。修正 A：当前 `authorized()` 是无密钥公开 hash 谓词，**当前冻结数据不具备 ACL 秘密性**，不能作为"攻击者不知道授权状态"的成员推断证据；新增未来私有 ACL 模型与研究者/攻击者视图边界表。修正 B：统计独立单位由 query 改为**独立 ACL instance**，区分固定成员推断与成员泛化推断，禁止把同一目标的 A0/A1 反事实轨迹当作两个独立攻击样本。所有受影响的原有表述均带 `[R1]` 标记。基线 HEAD `72440e82502e240ca64bcb2dfc43062e61e394d4`，本分支 `research/h1-rm-3a3-r1-acl-secrecy-independence`，唯一修改文件即本文档。
 
+> **`[R1.1]` H1-RM.3A.3-R1.1（Target Selection & Baseline Metadata Erratum）**：本轮为**文档一致性修正**，只处理目标成员选择、类别先验解释与基线元数据三处文字，**裁决 CONDITIONAL 与所有硬边界原样保留、不进入 H1-RM.3B**。修正 A：删除 Phase 1-D 中依赖公开 hash 授权集合选目标的旧规则，改为 ACL 生成前用预注册种子从完整公开候选集合独立预选；修正 B：区分自然授权先验 $p=0.1$、Balanced Accuracy 与类别平衡诊断集三个独立概念；修正 C：§0 明确原始 3A.3 / R1 / R1.1 三层基线与提交关系。所有受影响的原有表述带 `[R1.1]` 标记。本次直接基线 HEAD `1e0149746b28a0fe99f0a5cc7ab79b50f7249722`，目标分支 `research/h1-rm-3a3-r1-1-target-selection`，唯一修改文件即本文档。
+
 **研究假设**（待验证，本阶段不判定成立与否）：
 
 > 对同一个 HNSW 索引 $G$ 和查询 $q$，仅改变一个目标成员 $u$ 的授权状态，加入 K-hit 停止后，攻击者能否比观察普通过滤搜索获得更多关于 $u$ 授权状态的信息？
@@ -14,13 +16,18 @@
 | --- | --- |
 | 仓库 | `kaikai-cao/pa-vfann-experiment` |
 | 对象存储链（common gitdir） | `pa-vfann-exp10-hnswlib-probe-workspace/.git` |
-| 基线分支 | `research/h1-rm-3a2-r1-evidence-erratum` |
-| 基线 HEAD | `4babeaa2aad2a02604cf5a448709690e67f3a43d` |
-| 父提交 | `dd6d28c2c5aad37189dd82114e2b5a07103919b4` |
-| 本分支 | `research/h1-rm-3a3-paired-acl-feasibility` |
-| 唯一新增文件 | 本文档 |
 
-**Phase 0 门禁**：common gitdir 为 `pa-vfann-exp10-hnswlib-probe-workspace/.git`（对象可解析）；分支/HEAD/父提交精确匹配；工作区 clean；目标分支本地与远端不存在；目标 worktree 路径空闲；基线报告 blob = `7e6dcf63ef6ee88e4b54f36dcdb3296dd2bb4bdb` 与冻结提交一致。**全部 PASS**。
+**`[R1.1]` 文档历史层级**（同一份文档在三轮审计中的状态；下列"本分支 / 唯一新增文件"是**各轮当时的记录**，不得误读为当前分支状态）：
+
+| 层级 | 分支 | HEAD（该轮产出提交） | 本文档在该轮的角色 | 该轮起点基线 |
+| --- | --- | --- | --- | --- |
+| 原始 3A.3 设计阶段 | `research/h1-rm-3a3-paired-acl-feasibility` | `72440e82502e240ca64bcb2dfc43062e61e394d4` | **新增文件**（原始唯一新增文件） | 分支 `research/h1-rm-3a2-r1-evidence-erratum` / HEAD `4babeaa2aad2a02604cf5a448709690e67f3a43d` / 父 `dd6d28c2c5aad37189dd82114e2b5a07103919b4` |
+| R1 ACL 秘密性修正 | `research/h1-rm-3a3-r1-acl-secrecy-independence` | `1e0149746b28a0fe99f0a5cc7ab79b50f7249722` | **修改文件**（R1 唯一修改文件） | 3A.3 HEAD `72440e82502e240ca64bcb2dfc43062e61e394d4` |
+| 本次 R1.1 修正的直接基线 | `research/h1-rm-3a3-r1-acl-secrecy-independence` | `1e0149746b28a0fe99f0a5cc7ab79b50f7249722` | **修改文件**（R1.1 唯一修改文件） | R1 HEAD `1e0149746b28a0fe99f0a5cc7ab79b50f7249722` |
+
+**`[R1.1]` 本次（R1.1）任务固定值**：基线分支 `research/h1-rm-3a3-r1-acl-secrecy-independence`，基线 HEAD `1e0149746b28a0fe99f0a5cc7ab79b50f7249722`，父提交 `72440e82502e240ca64bcb2dfc43062e61e394d4`，目标分支 `research/h1-rm-3a3-r1-1-target-selection`，唯一允许修改文件 `docs/H1_RM_3A_3_PAIRED_ACL_LEAKAGE_FEASIBILITY.md`。
+
+**Phase 0 门禁**：原始 3A.3 阶段记录——common gitdir 为 `pa-vfann-exp10-hnswlib-probe-workspace/.git`（对象可解析）；分支/HEAD/父提交精确匹配；工作区 clean；目标分支本地与远端不存在；目标 worktree 路径空闲；基线报告 blob = `7e6dcf63ef6ee88e4b54f36dcdb3296dd2bb4bdb` 与冻结提交一致。**全部 PASS**（历史记录）。**`[R1.1]` 本次门禁**：common gitdir、分支 `research/h1-rm-3a3-r1-acl-secrecy-independence`、HEAD `1e01497…`、父提交 `72440e8…`、工作区 clean、目标分支本地与远端均不存在、目标 worktree 路径空闲、报告 blob = `9b3e433c7956d2386b566e0525d5215395478dda` 与冻结提交三处一致。**全部 PASS**。
 
 **硬边界**：本轮只读核查代码与冻结数据、设计配对协议、冻结攻击者模型与统计量。禁止修改 C++/Python/`StorageAccess`、禁止生成四格数据、禁止运行 C0/C1/C2、禁止重跑 EXP-10 或 H1.1–H1.4、禁止创建 block backend、禁止声称已获得真实 TEE page trace、禁止启动 H1-RM.3B、禁止修改冻结产物、禁止建 PR。**无论本阶段裁决为何，均不自动启动 H1-RM.3B。**
 
@@ -123,7 +130,17 @@ bool should_stop_search(float candidate_dist, float lowerBound) override {
 
 ### D. 目标成员 $u$ 如何选取？——**必须预先固定；现有样本不足以定义攻击者训练分布**
 
-**选择依据（冻结）**：$u$ 必须从**公开逻辑身份**中按与轨迹无关的规则预先确定——例如对授权节点集合（100 个，label 空间可由公开 hash 规则离线复算）按 `label` 升序取前 $P$ 个，或对全部 1000 个 label 用固定种子 hash 排序取前 $P$。**禁止**先看轨迹 gap/K-hit 位置再挑"差异最大"的节点（那是对测试集的隐式调参，会使 BA 虚高）。选择规则、随机种子与 $P$ 值必须在数据生成前写入 manifest。
+**选择依据（冻结）`[R1.1]`——目标成员从完整、公开的候选成员集合中预先选择，不依赖 ACL**：
+
+1. **在生成 ACL instance 之前**，用预注册的固定随机种子与确定性规则，从**完整候选成员集合**（全部公开 label，而非任何授权子集）中选出目标成员集合 $U$。
+2. 成员选择**不得依赖**真实 ACL、授权状态、轨迹、K-hit 位置或任何搜索结果。
+3. 目标集合、选择规则与随机种子由研究者记录；攻击者是否知道目标身份**由具体威胁模型决定**（见 Phase 2 攻击者模型）。
+4. 每个独立 ACL instance 的授权状态**独立生成**，遵循预设的自然先验 $p=0.1$（见 Phase 4 自然先验定义）。
+5. **固定成员推断**与**成员泛化推断**继续严格区分（见下）。
+
+> **`[R1.1]` 删除的旧规则**：原报告示例"对授权节点集合（100 个，label 空间可由公开 hash 规则离线复算）按 `label` 升序取前 $P$ 个"依赖**当前公开 hash ACL**，与未来**私有随机 bitmap** 模型不兼容（私有 bitmap 下授权集合对研究者选点前亦不应成为选择依据），故删除。示例"对全部 1000 个 label 用固定种子 hash 排序取前 $P$"符合上述协议，予以保留。**禁止**先看轨迹 gap/K-hit 位置再挑"差异最大"的节点（对测试集的隐式调参，会使 BA 虚高）。选择规则、随机种子与 $P$ 值必须在 ACL 生成前预注册。
+
+**多目标成员的类别分布检查 `[R1.1]`**：允许研究者在生成 ACL **之后**检查目标集合的实际类别分布（授权/未授权各多少），但**不得**依据轨迹挑选成员，也**不得**把依据真实授权状态筛出的样本误称为"自然部署分布"——此类条件化筛选会改变先验，须如实标注。
 
 **两种样本单位的统计含义 `[R1]`**：
 
@@ -197,6 +214,16 @@ $$T_{j,u,q,a,c}=T(q,G_j,A_{j,u}^{(a)},C_c),\quad A_{j,u}^{(0)}=A_{j,-u}\cup\{u=0
 
 ## Phase 4 — 冻结统计量与攻击成功标准
 
+#### `[R1.1]` 三个必须区分的概念：自然先验 / Balanced Accuracy / 类别平衡诊断集
+
+原报告"授权/未授权平衡先验"一句把三件事混为一谈，现拆为相互独立的三个概念：
+
+1. **自然授权先验**：$P(U=1)=p=0.1$。这是未来实验中 ACL 生成机制（独立 Bernoulli bitmap）的授权比例先验，**也是攻击者可以知道的先验信息**（见 Phase 2 已知项）。它是数据生成的真实分布，不是评价时的重采样设定。
+2. **Balanced Accuracy**：$BA=\frac{TPR+TNR}{2}$——对正类（授权）与负类（未授权）分别计算召回率后**等权平均**。BA 对两类等权是**指标的构造方式**，**不意味着**实际 ACL 中授权与未授权成员各占一半；BA 的随机猜测基线恒为 $0.5$（与 $p=0.1$ 无关）。因此 $\operatorname{Adv}_c=BA_c-\tfrac12$ 中的 $\tfrac12$ 是 BA 的随机基线，不是"自然分布下猜多数的准确率"。
+3. **类别平衡诊断集**：研究者**可另行**构造授权/未授权 1:1 的类别平衡诊断评估集，但**必须明确标注其采样方式**（重采样/加权），不得把它当作自然授权分布（$p=0.1$）。正式结果应保留自然先验；在适用时**同时报告自然分布下**的准确率（accuracy）、精确率（precision）、PR-AUC 等指标，避免仅以 BA 掩盖 $p=0.1$ 下的类别不平衡表现。
+
+> 本轮**不新增**分类器、数据集或指标计算，以上仅为协议文字澄清。
+
 **评价量**（对固定攻击者、留出测试集，C1 与 C2 分别评估）：
 
 $$\operatorname{Adv}_c=\operatorname{BA}_c-\tfrac12,\qquad \boxed{\ \Delta_{\mathrm{adv}}=\operatorname{BA}_{C2}-\operatorname{BA}_{C1}\ }$$
@@ -216,7 +243,7 @@ $\operatorname{Adv}_{C1}$ = 普通过滤下推断能力；$\operatorname{Adv}_{C
 
 **`[R1]` Bootstrap 修正**：对 $\Delta_{adv}$ 的主要重采样单位改为**独立 ACL instance $j$**。同一 ACL instance 内的目标成员、所有 query、A0/A1 配对记录与 C1/C2 结果作为一个**相关簇**整体重采样；计算 C1/C2 经验增益时保留两种条件的配对关系。Query 仅作实例内重复观察，**不得当作独立 ACL 标签样本**。若采用多个目标成员，须显式说明同一 ACL instance 下多个目标共享 ACL 的相关性（簇内相关，按簇处理）。
 
-**其余统计要求**：① 授权/未授权平衡先验；② 保留两种 ACL 状态的配对（研究者视图）；③ 同一 ACL instance 的所有四格记录放同一训练或测试分组（防配对与实例泄露）；④ 训练与调参只用训练集，测试集不参与模型选择；⑤ 主 bootstrap 按 ACL instance 分簇（见上）；⑥ 同时报 BA、AUC、95% CI 及每个目标成员的结果；⑦ 独立 ACL instance 不足以支撑独立测试集时，**不得**用训练准确率或未分组交叉验证替代，须降级为敏感性分析。
+**其余统计要求 `[R1.1]`**：① 自然授权先验 $p=0.1$（数据生成分布，攻击者可知），评价指标 BA 对两类等权、其随机基线为 0.5，二者不同；类别平衡诊断集须标注采样方式且不充当自然分布（见本节三段澄清）；② 保留两种 ACL 状态的配对（研究者视图）；③ 同一 ACL instance 的所有四格记录放同一训练或测试分组（防配对与实例泄露）；④ 训练与调参只用训练集，测试集不参与模型选择；⑤ 主 bootstrap 按 ACL instance 分簇（见上）；⑥ 同时报 BA、AUC、95% CI 及每个目标成员的结果；⑦ 独立 ACL instance 不足以支撑独立测试集时，**不得**用训练准确率或未分组交叉验证替代，须降级为敏感性分析。
 
 **正面判据（须同时满足）**：C2 测试 BA 显著高于随机基线（0.5）；$\Delta_{adv}$ 的 95% 配对 CI（按 ACL instance）下界 >0；结果不由 ACL instance、query、成员身份、索引差异、A0/A1 配对标记或其他泄露字段直接造成；输入确为攻击者可观察轨迹而非内部 search trace 或反事实配对轨迹。
 
@@ -265,5 +292,10 @@ $\operatorname{Adv}_{C1}$ = 普通过滤下推断能力；$\operatorname{Adv}_{C
 | `[R1]` query 不再被误称独立授权样本；bootstrap 主单位改为独立 ACL instance，query 仅实例内重复观察 | PASS |
 | `[R1]` shadow ACL、A0/A1 反事实与训练/测试隔离的单位定义一致；未把 A0/A1 当独立攻击样本 | PASS |
 | `[R1]` 区分固定成员推断与成员泛化推断；CONDITIONAL 裁决原样保留 | PASS |
+| `[R1.1]` 已删除"公开 hash 授权集合按 label 升序取前 P"的旧选点规则 | PASS |
+| `[R1.1]` 目标成员在 ACL 生成前由预注册种子从完整公开候选集合独立预选，不依赖授权状态/轨迹/K-hit/搜索结果 | PASS |
+| `[R1.1]` 自然先验 $p=0.1$、Balanced Accuracy（随机基线 0.5）、类别平衡诊断集三者明确区分，正式结果保留自然先验 | PASS |
+| `[R1.1]` §0 分清原始 3A.3 / R1 / R1.1 三层基线、HEAD 与文件角色（新增/修改），历史"本分支/唯一新增文件"未误读为当前状态 | PASS |
+| `[R1.1]` CONDITIONAL 裁决与全部硬边界原样保留；未改代码/数据/实验，未启动 3B、未建 PR | PASS |
 
 本阶段到此停止；拿到真实配对证据后再裁决，不自动开始下一阶段。
