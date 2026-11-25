@@ -1,0 +1,108 @@
+{
+  "scale": {
+    "users": 186,
+    "groups": 25,
+    "containers": 210,
+    "acl_change_events": 49,
+    "documents_in_manifest": 12214,
+    "golden_qa": 616,
+    "acl_leak_probes": 1040
+  },
+  "acl_temporal": {
+    "event_time_min": "2026-03-01T00:00:00Z",
+    "event_time_max": "2026-09-25T00:00:00Z",
+    "events_with_deny_users": 13,
+    "events_with_allow_users": 22,
+    "containers_with_initial_acl": 210,
+    "containers_with_events": 45,
+    "final_acl_equals_last_event": "45/45",
+    "reconstruction": "initial_acl + timestamp-ordered full-state events -> effective ACL at time t"
+  },
+  "group_history": {
+    "entries": 19,
+    "entries_with_timestamp": 19,
+    "groups_with_history": 14
+  },
+  "role_change_ground_truth": {
+    "users_with_move_date": [
+      {
+        "user": "u4",
+        "from_team": "payments",
+        "move_date": "2026-07-01T00:00:00Z",
+        "to_team": "security"
+      },
+      {
+        "user": "u019",
+        "from_team": "platform",
+        "move_date": "2026-03-15T00:00:00Z",
+        "to_team": "sre"
+      },
+      {
+        "user": "u044",
+        "from_team": "growth",
+        "move_date": "2026-08-15T00:00:00Z",
+        "to_team": "data"
+      }
+    ],
+    "golden_asking_users": [
+      "u1",
+      "u2",
+      "u3",
+      "u4",
+      "u5",
+      "u6"
+    ],
+    "golden_categories": {
+      "single_hop": 102,
+      "multi_hop": 122,
+      "temporal": 82,
+      "conflicting_sources": 52,
+      "acl_differentiated": 122,
+      "acl_time_travel": 52,
+      "unanswerable": 42,
+      "aggregation": 42
+    },
+    "probe_attack_types": {
+      "direct_ask": 149,
+      "paraphrase": 149,
+      "codename_guess": 149,
+      "broad_summarize": 149,
+      "citation_fishing": 148,
+      "post_revocation_ask": 148,
+      "indirect_prompt_injection": 148
+    }
+  },
+  "synthetic_artifact_risk": {
+    "space_to_team_mapping": {
+      "PLAT": "platform",
+      "PAY": "payments",
+      "IDN": "identity",
+      "DATA": "data",
+      "MOB": "mobile",
+      "GROW": "growth",
+      "SEC": "security",
+      "SRE": "sre",
+      "SUP": "support-eng",
+      "ENG": "platform",
+      "PROD": "growth",
+      "EXEC": "payments"
+    },
+    "confluence_doc_prefix_counts": {
+      "DATA": 97,
+      "ENG": 96,
+      "EXEC": 96,
+      "GROW": 97,
+      "IDN": 97,
+      "MOB": 97,
+      "PAY": 97,
+      "PLAT": 97,
+      "PROD": 96,
+      "SEC": 97,
+      "SRE": 97,
+      "SUP": 96
+    },
+    "note": "Document identifiers encode Confluence space keys, which map deterministically to team ids in world/bible.json. A role classifier served with raw docids may decode team labels from ID strings rather than infer authorization from access patterns. Any future experiment must use opaque, non-semantic docids."
+  },
+  "synthetic_guarantee": "dataset card declares 100% synthetic and fictional; not real enterprise telemetry",
+  "verdict": "credible point-in-time ACL / role-change ground truth exists; no agentic retrieval traces exist in this dataset; strong namespace-team coupling requires an opaque-ID control"
+}

@@ -1,0 +1,708 @@
+{
+  "task": "EXP-02-R0",
+  "source_collection": "traces/hotpotqa-test/BM25_k3/search_r1/Qwen-14B",
+  "sampling": "first N qids sorted lexicographically from retrieved_docs.tsv",
+  "samples": [
+    {
+      "sample_id": "ASQ-QWEN14B-001",
+      "qid": "5a70f1685542994082a3e40f",
+      "task_or_session_id": "5a70f1685542994082a3e40f",
+      "task_id_scope": "dataset qid; server visibility depends on deployment (NOT assumed)",
+      "retrieval_call_count": 2,
+      "has_call_order": true,
+      "iteration_values": [
+        0,
+        1
+      ],
+      "has_docid": true,
+      "docid_unique_count": 5,
+      "docid_linkable_across_calls_in_trace": 0,
+      "docid_linkable_across_traces": 0,
+      "has_rank": true,
+      "has_wall_clock_timestamp": false,
+      "fields_meet_audit_requirements": true,
+      "researcher_only_fields_excluded": [
+        "llm_query",
+        "thought",
+        "answer"
+      ],
+      "anomalies": [
+        "no docid in this trace recurs in another trace of the collection"
+      ]
+    },
+    {
+      "sample_id": "ASQ-QWEN14B-002",
+      "qid": "5a71095e5542994082a3e4f3",
+      "task_or_session_id": "5a71095e5542994082a3e4f3",
+      "task_id_scope": "dataset qid; server visibility depends on deployment (NOT assumed)",
+      "retrieval_call_count": 1,
+      "has_call_order": true,
+      "iteration_values": [
+        0
+      ],
+      "has_docid": true,
+      "docid_unique_count": 3,
+      "docid_linkable_across_calls_in_trace": 2,
+      "docid_linkable_across_traces": 2,
+      "has_rank": true,
+      "has_wall_clock_timestamp": false,
+      "fields_meet_audit_requirements": true,
+      "researcher_only_fields_excluded": [
+        "llm_query",
+        "thought",
+        "answer"
+      ],
+      "anomalies": []
+    },
+    {
+      "sample_id": "ASQ-QWEN14B-003",
+      "qid": "5a71166d5542994082a3e576",
+      "task_or_session_id": "5a71166d5542994082a3e576",
+      "task_id_scope": "dataset qid; server visibility depends on deployment (NOT assumed)",
+      "retrieval_call_count": 2,
+      "has_call_order": true,
+      "iteration_values": [
+        0,
+        1
+      ],
+      "has_docid": true,
+      "docid_unique_count": 6,
+      "docid_linkable_across_calls_in_trace": 3,
+      "docid_linkable_across_traces": 3,
+      "has_rank": true,
+      "has_wall_clock_timestamp": false,
+      "fields_meet_audit_requirements": true,
+      "researcher_only_fields_excluded": [
+        "llm_query",
+        "thought",
+        "answer"
+      ],
+      "anomalies": []
+    },
+    {
+      "sample_id": "ASQ-QWEN14B-004",
+      "qid": "5a711c535542994082a3e59b",
+      "task_or_session_id": "5a711c535542994082a3e59b",
+      "task_id_scope": "dataset qid; server visibility depends on deployment (NOT assumed)",
+      "retrieval_call_count": 3,
+      "has_call_order": true,
+      "iteration_values": [
+        0,
+        1,
+        2
+      ],
+      "has_docid": true,
+      "docid_unique_count": 3,
+      "docid_linkable_across_calls_in_trace": 0,
+      "docid_linkable_across_traces": 0,
+      "has_rank": true,
+      "has_wall_clock_timestamp": false,
+      "fields_meet_audit_requirements": true,
+      "researcher_only_fields_excluded": [
+        "llm_query",
+        "thought",
+        "answer"
+      ],
+      "anomalies": [
+        "no docid in this trace recurs in another trace of the collection"
+      ]
+    },
+    {
+      "sample_id": "ASQ-QWEN14B-005",
+      "qid": "5a711cb45542994082a3e59f",
+      "task_or_session_id": "5a711cb45542994082a3e59f",
+      "task_id_scope": "dataset qid; server visibility depends on deployment (NOT assumed)",
+      "retrieval_call_count": 2,
+      "has_call_order": true,
+      "iteration_values": [
+        0,
+        1
+      ],
+      "has_docid": true,
+      "docid_unique_count": 5,
+      "docid_linkable_across_calls_in_trace": 0,
+      "docid_linkable_across_traces": 0,
+      "has_rank": true,
+      "has_wall_clock_timestamp": false,
+      "fields_meet_audit_requirements": true,
+      "researcher_only_fields_excluded": [
+        "llm_query",
+        "thought",
+        "answer"
+      ],
+      "anomalies": [
+        "no docid in this trace recurs in another trace of the collection"
+      ]
+    },
+    {
+      "sample_id": "ASQ-QWEN14B-006",
+      "qid": "5a7125b95542994082a3e5d5",
+      "task_or_session_id": "5a7125b95542994082a3e5d5",
+      "task_id_scope": "dataset qid; server visibility depends on deployment (NOT assumed)",
+      "retrieval_call_count": 3,
+      "has_call_order": true,
+      "iteration_values": [
+        0,
+        1,
+        2
+      ],
+      "has_docid": true,
+      "docid_unique_count": 5,
+      "docid_linkable_across_calls_in_trace": 0,
+      "docid_linkable_across_traces": 0,
+      "has_rank": true,
+      "has_wall_clock_timestamp": false,
+      "fields_meet_audit_requirements": true,
+      "researcher_only_fields_excluded": [
+        "llm_query",
+        "thought",
+        "answer"
+      ],
+      "anomalies": [
+        "no docid in this trace recurs in another trace of the collection"
+      ]
+    },
+    {
+      "sample_id": "ASQ-QWEN14B-007",
+      "qid": "5a7133565542994082a3e65c",
+      "task_or_session_id": "5a7133565542994082a3e65c",
+      "task_id_scope": "dataset qid; server visibility depends on deployment (NOT assumed)",
+      "retrieval_call_count": 6,
+      "has_call_order": true,
+      "iteration_values": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "has_docid": true,
+      "docid_unique_count": 9,
+      "docid_linkable_across_calls_in_trace": 0,
+      "docid_linkable_across_traces": 0,
+      "has_rank": true,
+      "has_wall_clock_timestamp": false,
+      "fields_meet_audit_requirements": true,
+      "researcher_only_fields_excluded": [
+        "llm_query",
+        "thought",
+        "answer"
+      ],
+      "anomalies": [
+        "no docid in this trace recurs in another trace of the collection"
+      ]
+    },
+    {
+      "sample_id": "ASQ-QWEN14B-008",
+      "qid": "5a713a5a5542994082a3e6a9",
+      "task_or_session_id": "5a713a5a5542994082a3e6a9",
+      "task_id_scope": "dataset qid; server visibility depends on deployment (NOT assumed)",
+      "retrieval_call_count": 2,
+      "has_call_order": true,
+      "iteration_values": [
+        0,
+        1
+      ],
+      "has_docid": true,
+      "docid_unique_count": 5,
+      "docid_linkable_across_calls_in_trace": 0,
+      "docid_linkable_across_traces": 0,
+      "has_rank": true,
+      "has_wall_clock_timestamp": false,
+      "fields_meet_audit_requirements": true,
+      "researcher_only_fields_excluded": [
+        "llm_query",
+        "thought",
+        "answer"
+      ],
+      "anomalies": [
+        "no docid in this trace recurs in another trace of the collection"
+      ]
+    },
+    {
+      "sample_id": "ASQ-QWEN14B-009",
+      "qid": "5a713dcb5542994082a3e6d9",
+      "task_or_session_id": "5a713dcb5542994082a3e6d9",
+      "task_id_scope": "dataset qid; server visibility depends on deployment (NOT assumed)",
+      "retrieval_call_count": 3,
+      "has_call_order": true,
+      "iteration_values": [
+        0,
+        1,
+        2
+      ],
+      "has_docid": true,
+      "docid_unique_count": 5,
+      "docid_linkable_across_calls_in_trace": 0,
+      "docid_linkable_across_traces": 0,
+      "has_rank": true,
+      "has_wall_clock_timestamp": false,
+      "fields_meet_audit_requirements": true,
+      "researcher_only_fields_excluded": [
+        "llm_query",
+        "thought",
+        "answer"
+      ],
+      "anomalies": [
+        "no docid in this trace recurs in another trace of the collection"
+      ]
+    },
+    {
+      "sample_id": "ASQ-QWEN14B-010",
+      "qid": "5a713ea95542994082a3e6e4",
+      "task_or_session_id": "5a713ea95542994082a3e6e4",
+      "task_id_scope": "dataset qid; server visibility depends on deployment (NOT assumed)",
+      "retrieval_call_count": 2,
+      "has_call_order": true,
+      "iteration_values": [
+        0,
+        1
+      ],
+      "has_docid": true,
+      "docid_unique_count": 5,
+      "docid_linkable_across_calls_in_trace": 0,
+      "docid_linkable_across_traces": 0,
+      "has_rank": true,
+      "has_wall_clock_timestamp": false,
+      "fields_meet_audit_requirements": true,
+      "researcher_only_fields_excluded": [
+        "llm_query",
+        "thought",
+        "answer"
+      ],
+      "anomalies": [
+        "no docid in this trace recurs in another trace of the collection"
+      ]
+    },
+    {
+      "sample_id": "ASQ-QWEN14B-011",
+      "qid": "5a71443f5542994082a3e727",
+      "task_or_session_id": "5a71443f5542994082a3e727",
+      "task_id_scope": "dataset qid; server visibility depends on deployment (NOT assumed)",
+      "retrieval_call_count": 3,
+      "has_call_order": true,
+      "iteration_values": [
+        0,
+        1,
+        2
+      ],
+      "has_docid": true,
+      "docid_unique_count": 6,
+      "docid_linkable_across_calls_in_trace": 0,
+      "docid_linkable_across_traces": 0,
+      "has_rank": true,
+      "has_wall_clock_timestamp": false,
+      "fields_meet_audit_requirements": true,
+      "researcher_only_fields_excluded": [
+        "llm_query",
+        "thought",
+        "answer"
+      ],
+      "anomalies": [
+        "no docid in this trace recurs in another trace of the collection"
+      ]
+    },
+    {
+      "sample_id": "ASQ-QWEN14B-012",
+      "qid": "5a7166395542994082a3e814",
+      "task_or_session_id": "5a7166395542994082a3e814",
+      "task_id_scope": "dataset qid; server visibility depends on deployment (NOT assumed)",
+      "retrieval_call_count": 2,
+      "has_call_order": true,
+      "iteration_values": [
+        0,
+        1
+      ],
+      "has_docid": true,
+      "docid_unique_count": 6,
+      "docid_linkable_across_calls_in_trace": 0,
+      "docid_linkable_across_traces": 0,
+      "has_rank": true,
+      "has_wall_clock_timestamp": false,
+      "fields_meet_audit_requirements": true,
+      "researcher_only_fields_excluded": [
+        "llm_query",
+        "thought",
+        "answer"
+      ],
+      "anomalies": [
+        "no docid in this trace recurs in another trace of the collection"
+      ]
+    },
+    {
+      "sample_id": "ASQ-QWEN14B-013",
+      "qid": "5a717d4c5542994082a3e854",
+      "task_or_session_id": "5a717d4c5542994082a3e854",
+      "task_id_scope": "dataset qid; server visibility depends on deployment (NOT assumed)",
+      "retrieval_call_count": 5,
+      "has_call_order": true,
+      "iteration_values": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "has_docid": true,
+      "docid_unique_count": 8,
+      "docid_linkable_across_calls_in_trace": 0,
+      "docid_linkable_across_traces": 0,
+      "has_rank": true,
+      "has_wall_clock_timestamp": false,
+      "fields_meet_audit_requirements": true,
+      "researcher_only_fields_excluded": [
+        "llm_query",
+        "thought",
+        "answer"
+      ],
+      "anomalies": [
+        "no docid in this trace recurs in another trace of the collection"
+      ]
+    },
+    {
+      "sample_id": "ASQ-QWEN14B-014",
+      "qid": "5a721d5a55429971e9dc9283",
+      "task_or_session_id": "5a721d5a55429971e9dc9283",
+      "task_id_scope": "dataset qid; server visibility depends on deployment (NOT assumed)",
+      "retrieval_call_count": 2,
+      "has_call_order": true,
+      "iteration_values": [
+        0,
+        1
+      ],
+      "has_docid": true,
+      "docid_unique_count": 5,
+      "docid_linkable_across_calls_in_trace": 0,
+      "docid_linkable_across_traces": 0,
+      "has_rank": true,
+      "has_wall_clock_timestamp": false,
+      "fields_meet_audit_requirements": true,
+      "researcher_only_fields_excluded": [
+        "llm_query",
+        "thought",
+        "answer"
+      ],
+      "anomalies": [
+        "no docid in this trace recurs in another trace of the collection"
+      ]
+    },
+    {
+      "sample_id": "ASQ-QWEN14B-015",
+      "qid": "5a721dfd55429971e9dc928b",
+      "task_or_session_id": "5a721dfd55429971e9dc928b",
+      "task_id_scope": "dataset qid; server visibility depends on deployment (NOT assumed)",
+      "retrieval_call_count": 1,
+      "has_call_order": true,
+      "iteration_values": [
+        0
+      ],
+      "has_docid": true,
+      "docid_unique_count": 3,
+      "docid_linkable_across_calls_in_trace": 0,
+      "docid_linkable_across_traces": 0,
+      "has_rank": true,
+      "has_wall_clock_timestamp": false,
+      "fields_meet_audit_requirements": true,
+      "researcher_only_fields_excluded": [
+        "llm_query",
+        "thought",
+        "answer"
+      ],
+      "anomalies": [
+        "no docid in this trace recurs in another trace of the collection"
+      ]
+    },
+    {
+      "sample_id": "ASQ-QWEN14B-016",
+      "qid": "5a722b8655429971e9dc9329",
+      "task_or_session_id": "5a722b8655429971e9dc9329",
+      "task_id_scope": "dataset qid; server visibility depends on deployment (NOT assumed)",
+      "retrieval_call_count": 8,
+      "has_call_order": true,
+      "iteration_values": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "has_docid": true,
+      "docid_unique_count": 10,
+      "docid_linkable_across_calls_in_trace": 0,
+      "docid_linkable_across_traces": 0,
+      "has_rank": true,
+      "has_wall_clock_timestamp": false,
+      "fields_meet_audit_requirements": true,
+      "researcher_only_fields_excluded": [
+        "llm_query",
+        "thought",
+        "answer"
+      ],
+      "anomalies": [
+        "no docid in this trace recurs in another trace of the collection"
+      ]
+    },
+    {
+      "sample_id": "ASQ-QWEN14B-017",
+      "qid": "5a722fae55429971e9dc9343",
+      "task_or_session_id": "5a722fae55429971e9dc9343",
+      "task_id_scope": "dataset qid; server visibility depends on deployment (NOT assumed)",
+      "retrieval_call_count": 2,
+      "has_call_order": true,
+      "iteration_values": [
+        0,
+        1
+      ],
+      "has_docid": true,
+      "docid_unique_count": 5,
+      "docid_linkable_across_calls_in_trace": 0,
+      "docid_linkable_across_traces": 0,
+      "has_rank": true,
+      "has_wall_clock_timestamp": false,
+      "fields_meet_audit_requirements": true,
+      "researcher_only_fields_excluded": [
+        "llm_query",
+        "thought",
+        "answer"
+      ],
+      "anomalies": [
+        "no docid in this trace recurs in another trace of the collection"
+      ]
+    },
+    {
+      "sample_id": "ASQ-QWEN14B-018",
+      "qid": "5a724ba25542990c210a40c7",
+      "task_or_session_id": "5a724ba25542990c210a40c7",
+      "task_id_scope": "dataset qid; server visibility depends on deployment (NOT assumed)",
+      "retrieval_call_count": 2,
+      "has_call_order": true,
+      "iteration_values": [
+        0,
+        1
+      ],
+      "has_docid": true,
+      "docid_unique_count": 6,
+      "docid_linkable_across_calls_in_trace": 0,
+      "docid_linkable_across_traces": 0,
+      "has_rank": true,
+      "has_wall_clock_timestamp": false,
+      "fields_meet_audit_requirements": true,
+      "researcher_only_fields_excluded": [
+        "llm_query",
+        "thought",
+        "answer"
+      ],
+      "anomalies": [
+        "no docid in this trace recurs in another trace of the collection"
+      ]
+    },
+    {
+      "sample_id": "ASQ-QWEN14B-019",
+      "qid": "5a7252db5542990c210a4104",
+      "task_or_session_id": "5a7252db5542990c210a4104",
+      "task_id_scope": "dataset qid; server visibility depends on deployment (NOT assumed)",
+      "retrieval_call_count": 5,
+      "has_call_order": true,
+      "iteration_values": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "has_docid": true,
+      "docid_unique_count": 9,
+      "docid_linkable_across_calls_in_trace": 2,
+      "docid_linkable_across_traces": 2,
+      "has_rank": true,
+      "has_wall_clock_timestamp": false,
+      "fields_meet_audit_requirements": true,
+      "researcher_only_fields_excluded": [
+        "llm_query",
+        "thought",
+        "answer"
+      ],
+      "anomalies": []
+    },
+    {
+      "sample_id": "ASQ-QWEN14B-020",
+      "qid": "5a7265825542997f827839a3",
+      "task_or_session_id": "5a7265825542997f827839a3",
+      "task_id_scope": "dataset qid; server visibility depends on deployment (NOT assumed)",
+      "retrieval_call_count": 9,
+      "has_call_order": true,
+      "iteration_values": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "has_docid": true,
+      "docid_unique_count": 16,
+      "docid_linkable_across_calls_in_trace": 0,
+      "docid_linkable_across_traces": 0,
+      "has_rank": true,
+      "has_wall_clock_timestamp": false,
+      "fields_meet_audit_requirements": true,
+      "researcher_only_fields_excluded": [
+        "llm_query",
+        "thought",
+        "answer"
+      ],
+      "anomalies": [
+        "no docid in this trace recurs in another trace of the collection"
+      ]
+    },
+    {
+      "sample_id": "ASQ-QWEN14B-021",
+      "qid": "5a726b0f5542997f827839be",
+      "task_or_session_id": "5a726b0f5542997f827839be",
+      "task_id_scope": "dataset qid; server visibility depends on deployment (NOT assumed)",
+      "retrieval_call_count": 9,
+      "has_call_order": true,
+      "iteration_values": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "has_docid": true,
+      "docid_unique_count": 7,
+      "docid_linkable_across_calls_in_trace": 0,
+      "docid_linkable_across_traces": 0,
+      "has_rank": true,
+      "has_wall_clock_timestamp": false,
+      "fields_meet_audit_requirements": true,
+      "researcher_only_fields_excluded": [
+        "llm_query",
+        "thought",
+        "answer"
+      ],
+      "anomalies": [
+        "no docid in this trace recurs in another trace of the collection"
+      ]
+    },
+    {
+      "sample_id": "ASQ-QWEN14B-022",
+      "qid": "5a729e7b5542992359bc313d",
+      "task_or_session_id": "5a729e7b5542992359bc313d",
+      "task_id_scope": "dataset qid; server visibility depends on deployment (NOT assumed)",
+      "retrieval_call_count": 2,
+      "has_call_order": true,
+      "iteration_values": [
+        0,
+        1
+      ],
+      "has_docid": true,
+      "docid_unique_count": 4,
+      "docid_linkable_across_calls_in_trace": 0,
+      "docid_linkable_across_traces": 0,
+      "has_rank": true,
+      "has_wall_clock_timestamp": false,
+      "fields_meet_audit_requirements": true,
+      "researcher_only_fields_excluded": [
+        "llm_query",
+        "thought",
+        "answer"
+      ],
+      "anomalies": [
+        "no docid in this trace recurs in another trace of the collection"
+      ]
+    },
+    {
+      "sample_id": "ASQ-QWEN14B-023",
+      "qid": "5a72a0be5542992359bc3143",
+      "task_or_session_id": "5a72a0be5542992359bc3143",
+      "task_id_scope": "dataset qid; server visibility depends on deployment (NOT assumed)",
+      "retrieval_call_count": 2,
+      "has_call_order": true,
+      "iteration_values": [
+        0,
+        1
+      ],
+      "has_docid": true,
+      "docid_unique_count": 5,
+      "docid_linkable_across_calls_in_trace": 0,
+      "docid_linkable_across_traces": 0,
+      "has_rank": true,
+      "has_wall_clock_timestamp": false,
+      "fields_meet_audit_requirements": true,
+      "researcher_only_fields_excluded": [
+        "llm_query",
+        "thought",
+        "answer"
+      ],
+      "anomalies": [
+        "no docid in this trace recurs in another trace of the collection"
+      ]
+    },
+    {
+      "sample_id": "ASQ-QWEN14B-024",
+      "qid": "5a72a9ab5542992359bc315a",
+      "task_or_session_id": "5a72a9ab5542992359bc315a",
+      "task_id_scope": "dataset qid; server visibility depends on deployment (NOT assumed)",
+      "retrieval_call_count": 2,
+      "has_call_order": true,
+      "iteration_values": [
+        0,
+        1
+      ],
+      "has_docid": true,
+      "docid_unique_count": 5,
+      "docid_linkable_across_calls_in_trace": 0,
+      "docid_linkable_across_traces": 0,
+      "has_rank": true,
+      "has_wall_clock_timestamp": false,
+      "fields_meet_audit_requirements": true,
+      "researcher_only_fields_excluded": [
+        "llm_query",
+        "thought",
+        "answer"
+      ],
+      "anomalies": [
+        "no docid in this trace recurs in another trace of the collection"
+      ]
+    },
+    {
+      "sample_id": "ASQ-QWEN14B-025",
+      "qid": "5a72ba165542992359bc318a",
+      "task_or_session_id": "5a72ba165542992359bc318a",
+      "task_id_scope": "dataset qid; server visibility depends on deployment (NOT assumed)",
+      "retrieval_call_count": 4,
+      "has_call_order": true,
+      "iteration_values": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "has_docid": true,
+      "docid_unique_count": 7,
+      "docid_linkable_across_calls_in_trace": 1,
+      "docid_linkable_across_traces": 1,
+      "has_rank": true,
+      "has_wall_clock_timestamp": false,
+      "fields_meet_audit_requirements": true,
+      "researcher_only_fields_excluded": [
+        "llm_query",
+        "thought",
+        "answer"
+      ],
+      "anomalies": []
+    }
+  ]
+}
