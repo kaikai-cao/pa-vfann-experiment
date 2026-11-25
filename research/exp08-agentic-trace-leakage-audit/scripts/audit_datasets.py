@@ -17,8 +17,18 @@ Usage (Windows Git Bash):
       --out-dir research/exp08-agentic-trace-leakage-audit/evidence \
       --samples 25
 
-If files are absent from --data-dir, pass --download to fetch them through
-huggingface_hub (pip install huggingface_hub). Two retries are used per file.
+Data version pinning (EXP-02-R0.1 Phase 2):
+  Downloads use the HuggingFace ``resolve/<revision>/`` URL with the exact
+  revision recorded in dataset_manifest.json -- never ``resolve/main``. The
+  downloader uses only the Python standard library (urllib.request), so no
+  third-party package is required. Every file (local or freshly downloaded)
+  is verified against the pinned SHA256 below; a mismatch is a hard error and
+  there is no silent fallback to another revision.
+
+If files are absent from --data-dir, pass --download to fetch them from the
+pinned revision. Two retries are used per file. Pass --force-download to
+re-download and overwrite even present files (used to demonstrate a real
+re-download); the SHA256 gate still applies.
 """
 
 from __future__ import annotations
@@ -27,14 +37,36 @@ import argparse
 import csv
 import hashlib
 import json
-import os
 import sys
+import urllib.request
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 
 ASQ_REPO = "AgenticSearchQueryset/ASQ"
 ACL_REPO = "DevLCodes/permission-aware-enterprise-rag-benchmark"
+
+# Pinned revisions -- must match dataset_manifest.json exactly. Never resolve main.
+ASQ_REVISION = "14554ef4cbadc42a05d3c99da6bc18abb9d7f81e"
+ACL_REVISION = "6e3bb8d6071c3a46e8e9c22c856a24c737b9792d"
+
+# Pinned SHA256 per local file, verified 2026-11-25 by re-downloading every file
+# from resolve/<pinned revision>/ (13/13 matched dataset_manifest.json).
+PINNED_SHA256 = {
+    "asq/Qwen-14B_answers.tsv": "0470bf19689fcd58c8069beca5ce09c88c3668f12be820080e3e1333e11d042c",
+    "asq/Qwen-14B_iter_queries.tsv": "bc9fbdbf943eccb5908d33f3a5faa74187276361d012e68cf17e17cd25efa30c",
+    "asq/Qwen-14B_retrieved_docs.tsv": "71c0c7dcc166b57ff810ec8ffd105859eb669805e44b76452e21f1e8ba41392b",
+    "asq/Qwen-14B_thoughts.tsv": "f50b70f61bf0a82cf9551135fedaea2416d093cd91b7fe88465589fc4c833c7d",
+    "asq/README.md": "3122fe9686b725be0cc696489f469aa28a47558f404f4f42197bb9f6be76edfc",
+    "acl/README.md": "ee6737b2fdf696f8a0a3eb96270359639a695e05231eeaa34e177afab7671440",
+    "acl/acl_acl_matrix.json": "b5283ab2d8903762e098026277d0cdebaadb26a8b0a4457a6c27774c14abfb6c",
+    "acl/acl_groups.json": "b750aec338495756d20003a60ce6337f96698cf3a1ad96bb2c610bb0a39fbc0a",
+    "acl/acl_identities.json": "a651830ccc95750661a35c8cc6b8bd6b42f9a5adacded60998d372b6fdbdd276",
+    "acl/world_bible.json": "9530a4e2d78f12b35eec5be9800ff9536a2d5781302c4d01391580bdff85c3b7",
+    "acl/eval_golden.jsonl": "f1c6097698ae99caa7e137c1a4ea53f20b8839da91e35a244968827b13182d3b",
+    "acl/eval_acl_leak_probes.jsonl": "61864c8f443c3aa508427f00acbb3ecb497f9be1687a2f37962f7cc2f6b17acb",
+    "acl/data_documents_manifest.jsonl": "f6db682cd6d69aa1ccbf4e1da56f47b6b993aaa2e7423619109eafc99f7537e6",
+}
 
 # One small, complete ASQ trace collection (chosen for audit speed; not representative of all configs).
 ASQ_COLLECTION = "traces/hotpotqa-test/BM25_k3/search_r1/Qwen-14B"
@@ -66,31 +98,73 @@ def sha256(path: Path) -> str:
     return h.hexdigest()
 
 
-def ensure_files(data_dir: Path, mapping: dict[str, str], repo: str, download: bool) -> dict[str, Path]:
+def download_from_revision(repo: str, revision: str, remote: str, dest: Path) -> None:
+    """Download one file from the pinned revision via stdlib urllib.
+
+    No fallback to ``main``: the URL contains the exact revision. Two retries.
+    """
+    url = f"https://huggingface.co/datasets/{repo}/resolve/{revision}/{remote}"
+    request = urllib.request.Request(url, headers={"User-Agent": "EXP-02-R0-audit/1.0"})
+    last_exc: Exception | None = None
+    for attempt in range(2):
+        try:
+            with urllib.request.urlopen(request, timeout=180) as response:
+                payload = response.read()
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            dest.write_bytes(payload)
+            return
+        except Exception as exc:  # noqa: BLE001 - explicit two-retry policy
+            last_exc = exc
+    raise RuntimeError(f"download failed after 2 attempts for {url}: {last_exc}")
+
+
+def ensure_files(
+    data_dir: Path,
+    mapping: dict[str, str],
+    repo: str,
+    revision: str,
+    download: bool,
+    force_download: bool,
+) -> tuple[dict[str, Path], list[dict]]:
+    """Return (paths, verification log). Every file is SHA256-gated to the pin."""
     paths: dict[str, Path] = {}
+    verification: list[dict] = []
     for remote, local in mapping.items():
         p = data_dir / local
-        if not p.exists():
-            if not download:
-                raise FileNotFoundError(
-                    f"missing {p}; place the downloaded raw file there or pass --download"
-                )
-            from huggingface_hub import hf_hub_download  # type: ignore
-
-            last = None
-            for attempt in range(2):
-                try:
-                    downloaded = hf_hub_download(repo_id=repo, filename=remote, repo_type="dataset")
-                    p.parent.mkdir(parents=True, exist_ok=True)
-                    p.write_bytes(Path(downloaded).read_bytes())
-                    last = None
-                    break
-                except Exception as exc:  # noqa: BLE001 - explicit two-retry policy
-                    last = exc
-            if last is not None:
-                raise RuntimeError(f"download failed after 2 attempts for {remote}: {last}")
+        expected = PINNED_SHA256[local]
+        if not p.exists() and not download:
+            raise FileNotFoundError(
+                f"missing {p}; place the pinned file there or pass --download "
+                f"(revision {revision})"
+            )
+        existed_before = p.exists()
+        if (not existed_before) or force_download:
+            download_from_revision(repo, revision, remote, p)
+            action = "re-downloaded (forced)" if existed_before else "downloaded (pinned revision)"
+        else:
+            action = "used-local-cache (SHA256-gated to pin)"
+        actual = sha256(p)
+        if actual != expected:
+            raise RuntimeError(
+                f"SHA256 MISMATCH for {local}: expected {expected} (revision {revision}), "
+                f"got {actual}; refusing to proceed (no silent fallback). "
+                f"Re-run with --download --force-download."
+            )
+        verification.append(
+            {
+                "file": local,
+                "remote_path": remote,
+                "revision": revision,
+                "resolve_url": f"https://huggingface.co/datasets/{repo}/resolve/{revision}/{remote}",
+                "sha256_expected": expected,
+                "sha256_actual": actual,
+                "sha256_match": True,
+                "size_bytes": p.stat().st_size,
+                "action": action,
+            }
+        )
         paths[remote] = p
-    return paths
+    return paths, verification
 
 
 def read_tsv(path: Path) -> list[dict[str, str]]:
@@ -324,43 +398,55 @@ def main() -> int:
     ap.add_argument("--data-dir", required=True, help="directory holding downloaded raw files")
     ap.add_argument("--out-dir", required=True, help="directory for JSON evidence outputs")
     ap.add_argument("--samples", type=int, default=25, help="number of ASQ traces to validate")
-    ap.add_argument("--download", action="store_true", help="download missing files via huggingface_hub")
-    ap.add_argument("--manifest-revision-asq", default="14554ef4cbadc42a05d3c99da6bc18abb9d7f81e")
-    ap.add_argument("--manifest-revision-acl", default="6e3bb8d6071c3a46e8e9c22c856a24c737b9792d")
+    ap.add_argument(
+        "--download",
+        action="store_true",
+        help="download missing files from the pinned revision (stdlib urllib)",
+    )
+    ap.add_argument(
+        "--force-download",
+        action="store_true",
+        help="re-download and overwrite all files from the pinned revision; SHA256 gate still applies",
+    )
     args = ap.parse_args()
 
     data_dir = Path(args.data_dir).expanduser().resolve()
     out_dir = Path(args.out_dir).expanduser().resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    asq_paths = ensure_files(data_dir, ASQ_FILES, ASQ_REPO, args.download)
-    acl_paths = ensure_files(data_dir, ACL_FILES, ACL_REPO, args.download)
+    asq_paths, asq_verify = ensure_files(
+        data_dir, ASQ_FILES, ASQ_REPO, ASQ_REVISION, args.download, args.force_download
+    )
+    acl_paths, acl_verify = ensure_files(
+        data_dir, ACL_FILES, ACL_REPO, ACL_REVISION, args.download, args.force_download
+    )
+    verification_log = asq_verify + acl_verify
 
     manifest = []
     for remote, p in asq_paths.items():
         manifest.append(
             manifest_entry(
                 "ASQ",
-                f"https://huggingface.co/datasets/{ASQ_REPO}/resolve/main/{remote}",
-                args.manifest_revision_asq,
+                f"https://huggingface.co/datasets/{ASQ_REPO}/resolve/{ASQ_REVISION}/{remote}",
+                ASQ_REVISION,
                 str(p.relative_to(data_dir)).replace("\\", "/"),
                 sha256(p),
                 p.stat().st_size,
                 "mit (per GitHub README and HF card; source datasets may carry their own licenses)",
-                "structure and sample validation passed",
+                "structure, pinned-revision SHA256 and sample validation passed",
             )
         )
     for remote, p in acl_paths.items():
         manifest.append(
             manifest_entry(
                 "Permission-Aware Enterprise RAG Benchmark",
-                f"https://huggingface.co/datasets/{ACL_REPO}/resolve/main/{remote}",
-                args.manifest_revision_acl,
+                f"https://huggingface.co/datasets/{ACL_REPO}/resolve/{ACL_REVISION}/{remote}",
+                ACL_REVISION,
                 str(p.relative_to(data_dir)).replace("\\", "/"),
                 sha256(p),
                 p.stat().st_size,
                 "mit (HF dataset card)",
-                "structure and ACL-history validation passed",
+                "structure, pinned-revision SHA256 and ACL-history validation passed",
             )
         )
 
@@ -368,12 +454,24 @@ def main() -> int:
     acl_summary = audit_acl(acl_paths)
 
     payload = {
-        "task": "EXP-02-R0",
+        "task": "EXP-02-R0 / EXP-02-R0.1 Phase 2 (pinned-revision download)",
         "generated_at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "version_pinning": {
+            "method": "stdlib urllib GET of resolve/<pinned revision>/<file>; SHA256 gate; no main fallback",
+            "asq_revision": ASQ_REVISION,
+            "acl_revision": ACL_REVISION,
+            "files_verified": len(verification_log),
+            "all_sha256_match": all(v["sha256_match"] for v in verification_log),
+            "verification": verification_log,
+        },
         "asq": asq_summary,
         "acl_benchmark": acl_summary,
         "dataset_manifest": manifest,
     }
+    (out_dir / "version_pinning.json").write_text(
+        json.dumps(payload["version_pinning"], ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
     (out_dir / "dataset_manifest.json").write_text(
         json.dumps({"datasets": manifest}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )

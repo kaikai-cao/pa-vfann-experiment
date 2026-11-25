@@ -127,8 +127,8 @@ HF revision `6e3bb8d6071c3a46e8e9c22c856a24c737b9792d`（lastModified 2026-11-05
 |---|---:|
 | `identities.json` 用户 | 186（`u1`–`u6` 主要 persona + 180 NPC，含承包商） |
 | `groups.json` 权限组 | 25；带时间戳的成员变更 19 条（分布在有历史的组） |
-| `acl_matrix.json` 容器 | 210；全部有 `initial_acl`；49 个容器有变更事件 |
-| ACL 变更事件 | 49，时间 2026-03-01 → 2026-09-25；13 条含 `deny_users`，22 条含 `allow_users` |
+| `acl_matrix.json` 容器 | 210；全部有 `initial_acl`；其中 45 个容器含变更事件 |
+| ACL 变更事件 | 49 条（分布在上述 45 个容器，非 49 个容器），时间 2026-03-01 → 2026-09-25；13 条含 `deny_users`，22 条含 `allow_users` |
 | `world/bible.json` | 9 个团队、27 个微服务、18 个时间/厂商/区域转换、34 个剧情事件、40 个 canary、18 个注入 |
 | `documents_manifest.jsonl` | 12,214 个文档记录 |
 | `golden.jsonl` | 616 条；8 类；asking_user 仅 `u1`–`u6` |

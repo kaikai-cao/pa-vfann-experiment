@@ -1,0 +1,152 @@
+{
+  "method": "stdlib urllib GET of resolve/<pinned revision>/<file>; SHA256 gate; no main fallback",
+  "asq_revision": "14554ef4cbadc42a05d3c99da6bc18abb9d7f81e",
+  "acl_revision": "6e3bb8d6071c3a46e8e9c22c856a24c737b9792d",
+  "files_verified": 13,
+  "all_sha256_match": true,
+  "verification": [
+    {
+      "file": "asq/Qwen-14B_answers.tsv",
+      "remote_path": "traces/hotpotqa-test/BM25_k3/search_r1/Qwen-14B/answers.tsv",
+      "revision": "14554ef4cbadc42a05d3c99da6bc18abb9d7f81e",
+      "resolve_url": "https://huggingface.co/datasets/AgenticSearchQueryset/ASQ/resolve/14554ef4cbadc42a05d3c99da6bc18abb9d7f81e/traces/hotpotqa-test/BM25_k3/search_r1/Qwen-14B/answers.tsv",
+      "sha256_expected": "0470bf19689fcd58c8069beca5ce09c88c3668f12be820080e3e1333e11d042c",
+      "sha256_actual": "0470bf19689fcd58c8069beca5ce09c88c3668f12be820080e3e1333e11d042c",
+      "sha256_match": true,
+      "size_bytes": 39731,
+      "action": "re-downloaded (forced)"
+    },
+    {
+      "file": "asq/Qwen-14B_iter_queries.tsv",
+      "remote_path": "traces/hotpotqa-test/BM25_k3/search_r1/Qwen-14B/iter_queries.tsv",
+      "revision": "14554ef4cbadc42a05d3c99da6bc18abb9d7f81e",
+      "resolve_url": "https://huggingface.co/datasets/AgenticSearchQueryset/ASQ/resolve/14554ef4cbadc42a05d3c99da6bc18abb9d7f81e/traces/hotpotqa-test/BM25_k3/search_r1/Qwen-14B/iter_queries.tsv",
+      "sha256_expected": "bc9fbdbf943eccb5908d33f3a5faa74187276361d012e68cf17e17cd25efa30c",
+      "sha256_actual": "bc9fbdbf943eccb5908d33f3a5faa74187276361d012e68cf17e17cd25efa30c",
+      "sha256_match": true,
+      "size_bytes": 260136,
+      "action": "re-downloaded (forced)"
+    },
+    {
+      "file": "asq/Qwen-14B_retrieved_docs.tsv",
+      "remote_path": "traces/hotpotqa-test/BM25_k3/search_r1/Qwen-14B/retrieved_docs.tsv",
+      "revision": "14554ef4cbadc42a05d3c99da6bc18abb9d7f81e",
+      "resolve_url": "https://huggingface.co/datasets/AgenticSearchQueryset/ASQ/resolve/14554ef4cbadc42a05d3c99da6bc18abb9d7f81e/traces/hotpotqa-test/BM25_k3/search_r1/Qwen-14B/retrieved_docs.tsv",
+      "sha256_expected": "71c0c7dcc166b57ff810ec8ffd105859eb669805e44b76452e21f1e8ba41392b",
+      "sha256_actual": "71c0c7dcc166b57ff810ec8ffd105859eb669805e44b76452e21f1e8ba41392b",
+      "sha256_match": true,
+      "size_bytes": 426488,
+      "action": "re-downloaded (forced)"
+    },
+    {
+      "file": "asq/Qwen-14B_thoughts.tsv",
+      "remote_path": "traces/hotpotqa-test/BM25_k3/search_r1/Qwen-14B/thoughts.tsv",
+      "revision": "14554ef4cbadc42a05d3c99da6bc18abb9d7f81e",
+      "resolve_url": "https://huggingface.co/datasets/AgenticSearchQueryset/ASQ/resolve/14554ef4cbadc42a05d3c99da6bc18abb9d7f81e/traces/hotpotqa-test/BM25_k3/search_r1/Qwen-14B/thoughts.tsv",
+      "sha256_expected": "f50b70f61bf0a82cf9551135fedaea2416d093cd91b7fe88465589fc4c833c7d",
+      "sha256_actual": "f50b70f61bf0a82cf9551135fedaea2416d093cd91b7fe88465589fc4c833c7d",
+      "sha256_match": true,
+      "size_bytes": 939620,
+      "action": "re-downloaded (forced)"
+    },
+    {
+      "file": "asq/README.md",
+      "remote_path": "README.md",
+      "revision": "14554ef4cbadc42a05d3c99da6bc18abb9d7f81e",
+      "resolve_url": "https://huggingface.co/datasets/AgenticSearchQueryset/ASQ/resolve/14554ef4cbadc42a05d3c99da6bc18abb9d7f81e/README.md",
+      "sha256_expected": "3122fe9686b725be0cc696489f469aa28a47558f404f4f42197bb9f6be76edfc",
+      "sha256_actual": "3122fe9686b725be0cc696489f469aa28a47558f404f4f42197bb9f6be76edfc",
+      "sha256_match": true,
+      "size_bytes": 5050,
+      "action": "re-downloaded (forced)"
+    },
+    {
+      "file": "acl/README.md",
+      "remote_path": "README.md",
+      "revision": "6e3bb8d6071c3a46e8e9c22c856a24c737b9792d",
+      "resolve_url": "https://huggingface.co/datasets/DevLCodes/permission-aware-enterprise-rag-benchmark/resolve/6e3bb8d6071c3a46e8e9c22c856a24c737b9792d/README.md",
+      "sha256_expected": "ee6737b2fdf696f8a0a3eb96270359639a695e05231eeaa34e177afab7671440",
+      "sha256_actual": "ee6737b2fdf696f8a0a3eb96270359639a695e05231eeaa34e177afab7671440",
+      "sha256_match": true,
+      "size_bytes": 8368,
+      "action": "re-downloaded (forced)"
+    },
+    {
+      "file": "acl/acl_acl_matrix.json",
+      "remote_path": "acl/acl_matrix.json",
+      "revision": "6e3bb8d6071c3a46e8e9c22c856a24c737b9792d",
+      "resolve_url": "https://huggingface.co/datasets/DevLCodes/permission-aware-enterprise-rag-benchmark/resolve/6e3bb8d6071c3a46e8e9c22c856a24c737b9792d/acl/acl_matrix.json",
+      "sha256_expected": "b5283ab2d8903762e098026277d0cdebaadb26a8b0a4457a6c27774c14abfb6c",
+      "sha256_actual": "b5283ab2d8903762e098026277d0cdebaadb26a8b0a4457a6c27774c14abfb6c",
+      "sha256_match": true,
+      "size_bytes": 177767,
+      "action": "re-downloaded (forced)"
+    },
+    {
+      "file": "acl/acl_groups.json",
+      "remote_path": "acl/groups.json",
+      "revision": "6e3bb8d6071c3a46e8e9c22c856a24c737b9792d",
+      "resolve_url": "https://huggingface.co/datasets/DevLCodes/permission-aware-enterprise-rag-benchmark/resolve/6e3bb8d6071c3a46e8e9c22c856a24c737b9792d/acl/groups.json",
+      "sha256_expected": "b750aec338495756d20003a60ce6337f96698cf3a1ad96bb2c610bb0a39fbc0a",
+      "sha256_actual": "b750aec338495756d20003a60ce6337f96698cf3a1ad96bb2c610bb0a39fbc0a",
+      "sha256_match": true,
+      "size_bytes": 28090,
+      "action": "re-downloaded (forced)"
+    },
+    {
+      "file": "acl/acl_identities.json",
+      "remote_path": "acl/identities.json",
+      "revision": "6e3bb8d6071c3a46e8e9c22c856a24c737b9792d",
+      "resolve_url": "https://huggingface.co/datasets/DevLCodes/permission-aware-enterprise-rag-benchmark/resolve/6e3bb8d6071c3a46e8e9c22c856a24c737b9792d/acl/identities.json",
+      "sha256_expected": "a651830ccc95750661a35c8cc6b8bd6b42f9a5adacded60998d372b6fdbdd276",
+      "sha256_actual": "a651830ccc95750661a35c8cc6b8bd6b42f9a5adacded60998d372b6fdbdd276",
+      "sha256_match": true,
+      "size_bytes": 71788,
+      "action": "re-downloaded (forced)"
+    },
+    {
+      "file": "acl/world_bible.json",
+      "remote_path": "world/bible.json",
+      "revision": "6e3bb8d6071c3a46e8e9c22c856a24c737b9792d",
+      "resolve_url": "https://huggingface.co/datasets/DevLCodes/permission-aware-enterprise-rag-benchmark/resolve/6e3bb8d6071c3a46e8e9c22c856a24c737b9792d/world/bible.json",
+      "sha256_expected": "9530a4e2d78f12b35eec5be9800ff9536a2d5781302c4d01391580bdff85c3b7",
+      "sha256_actual": "9530a4e2d78f12b35eec5be9800ff9536a2d5781302c4d01391580bdff85c3b7",
+      "sha256_match": true,
+      "size_bytes": 411882,
+      "action": "re-downloaded (forced)"
+    },
+    {
+      "file": "acl/eval_golden.jsonl",
+      "remote_path": "eval/golden.jsonl",
+      "revision": "6e3bb8d6071c3a46e8e9c22c856a24c737b9792d",
+      "resolve_url": "https://huggingface.co/datasets/DevLCodes/permission-aware-enterprise-rag-benchmark/resolve/6e3bb8d6071c3a46e8e9c22c856a24c737b9792d/eval/golden.jsonl",
+      "sha256_expected": "f1c6097698ae99caa7e137c1a4ea53f20b8839da91e35a244968827b13182d3b",
+      "sha256_actual": "f1c6097698ae99caa7e137c1a4ea53f20b8839da91e35a244968827b13182d3b",
+      "sha256_match": true,
+      "size_bytes": 405954,
+      "action": "re-downloaded (forced)"
+    },
+    {
+      "file": "acl/eval_acl_leak_probes.jsonl",
+      "remote_path": "eval/acl_leak_probes.jsonl",
+      "revision": "6e3bb8d6071c3a46e8e9c22c856a24c737b9792d",
+      "resolve_url": "https://huggingface.co/datasets/DevLCodes/permission-aware-enterprise-rag-benchmark/resolve/6e3bb8d6071c3a46e8e9c22c856a24c737b9792d/eval/acl_leak_probes.jsonl",
+      "sha256_expected": "61864c8f443c3aa508427f00acbb3ecb497f9be1687a2f37962f7cc2f6b17acb",
+      "sha256_actual": "61864c8f443c3aa508427f00acbb3ecb497f9be1687a2f37962f7cc2f6b17acb",
+      "sha256_match": true,
+      "size_bytes": 392297,
+      "action": "re-downloaded (forced)"
+    },
+    {
+      "file": "acl/data_documents_manifest.jsonl",
+      "remote_path": "data/documents_manifest.jsonl",
+      "revision": "6e3bb8d6071c3a46e8e9c22c856a24c737b9792d",
+      "resolve_url": "https://huggingface.co/datasets/DevLCodes/permission-aware-enterprise-rag-benchmark/resolve/6e3bb8d6071c3a46e8e9c22c856a24c737b9792d/data/documents_manifest.jsonl",
+      "sha256_expected": "f6db682cd6d69aa1ccbf4e1da56f47b6b993aaa2e7423619109eafc99f7537e6",
+      "sha256_actual": "f6db682cd6d69aa1ccbf4e1da56f47b6b993aaa2e7423619109eafc99f7537e6",
+      "sha256_match": true,
+      "size_bytes": 4935817,
+      "action": "re-downloaded (forced)"
+    }
+  ]
+}
