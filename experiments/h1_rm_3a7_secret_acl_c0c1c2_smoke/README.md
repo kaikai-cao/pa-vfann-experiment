@@ -66,6 +66,36 @@ For each group `C0`, `C1`, `C2` the program writes two separate files.
   (node-touch/distance observations allowed by the logical threat model).
 - `stop_check` / `search_stop` keep only position and type — no label, no
   stop flag, no hint about which callback authorised.
+- `event_index` is a **dense, observer-only counter** (see R1 below). It is
+  NOT the internal event index.
+
+## R1 — dense observer event index (side-channel fix)
+
+In the original 3A.7 output the observer proxy reused the internal
+`event_index` verbatim. Because the three internal-only event types
+(`filter_check`, `result_add`, `result_remove`) are removed from the observer,
+the surviving internal indices contained **gaps**: the gap count and positions
+encoded how many internal events had been dropped and where — a side channel
+through the index field alone, independent of any event field.
+
+R1 changes ONLY the observer proxy writer:
+
+- `event_index` in `observer_proxy_C*.jsonl` is now a **dense counter that is
+  regenerated after filtering**: `0, 1, 2, ...` over exactly the events that
+  are actually written, in their original relative order.
+- The counter is reset at the start of every (query, C-group).
+- It no longer corresponds to the internal event index. An observer cannot
+  infer the count or position of removed internal events from it.
+- The internal diagnostics layer keeps its **original, unmodified**
+  `event_index` (consecutive over all internal events, gaps included); nothing
+  about the trusted layer changed.
+
+This is a **narrow fix to the index side channel only**. It does NOT mean the
+observer trace is free of ACL-related information: surviving event types,
+their counts, positions, labels and distances may still correlate with the
+secret ACL under a threat model. No classifier / BA / AUC was run and no claim
+about residual leakage is made here. C0/C1/C2 search logic, the ACL fixture,
+the stop conditions and all internal diagnostics are unchanged.
 
 ## C0 / C1 / C2 definitions (mirroring RM2, independently implemented)
 

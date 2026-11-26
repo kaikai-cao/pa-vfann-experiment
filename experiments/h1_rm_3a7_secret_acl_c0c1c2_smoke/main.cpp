@@ -254,6 +254,11 @@ int main(int argc, char** argv) {
             g_events.clear();
             g_auth_hits = 0;
             g_khit_event_index = -1;
+            // Observer-only dense index: reset for every (query, group) and
+            // incremented ONLY for events actually written to the observer
+            // proxy. It deliberately does NOT reuse the internal event_index,
+            // so gaps caused by removed internal-only events are not leaked.
+            uint64_t observer_event_index = 0;
 
             SecretAclRecordingFilter filter(acl);
             std::vector<labeltype> returned;
@@ -338,10 +343,16 @@ int main(int argc, char** argv) {
                          << ",\"event_count\":" << g_events.size() << "}\n";
 
             // ---- observer proxy: no authorization bit, no result-set events ----
+            // event_index here is a DENSE OBSERVER-ONLY counter:
+            //   - reset above at the start of every (query, group);
+            //   - incremented only for events actually emitted below;
+            //   - independent of the internal e.event_index.
+            // The sparse internal sequence (and hence the count/position of
+            // removed internal-only events) is NOT encoded in this field.
             for (const auto& e : g_events) {
                 if (is_internal_only_event(e.event_type)) continue;
                 observer[gi] << "{\"query_id\":" << e.query_id
-                             << ",\"event_index\":" << e.event_index
+                             << ",\"event_index\":" << observer_event_index++
                              << ",\"group\":\"" << e.group << "\""
                              << ",\"event_type\":\"" << e.event_type << "\"";
                 if (e.event_type == "distance_eval") {

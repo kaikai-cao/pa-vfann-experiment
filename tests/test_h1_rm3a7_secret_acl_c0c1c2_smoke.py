@@ -177,19 +177,67 @@ def test_layers_are_separate_and_order_preserved(run_a):
         _, internal_events, _ = records_for(
             outdir, "internal_diagnostics", group)
         _, observer_events, _ = records_for(outdir, "observer_proxy", group)
-        # event_index is scoped per query (the harness resets it each query).
+        # Index sequences are scoped per query (reset at every query+group).
         for q in range(N_QUERIES):
-            internal_indices = [
-                e["event_index"] for e in internal_events if e["query_id"] == q
+            internal_q = [e for e in internal_events if e["query_id"] == q]
+            observer_q = [e for e in observer_events if e["query_id"] == q]
+            internal_indices = [e["event_index"] for e in internal_q]
+            observer_indices = [e["event_index"] for e in observer_q]
+            assert observer_indices, "observer proxy must emit events"
+            # Observer event_index is a DENSE observer-only renumbering.
+            assert observer_indices == list(range(len(observer_indices)))
+            # Internal diagnostics keep their ORIGINAL, unmodified indices:
+            # one consecutive sequence covering every internal event,
+            # including those removed from the observer view.
+            assert internal_indices == list(range(len(internal_indices)))
+            # Relative order of surviving events is preserved across layers.
+            internal_observable_types = [
+                e["event_type"] for e in internal_q
+                if e["event_type"] not in FORBIDDEN_OBS_EVENTS
             ]
-            observer_indices = [
-                e["event_index"] for e in observer_events if e["query_id"] == q
-            ]
-            assert observer_indices == sorted(observer_indices)
-            assert set(observer_indices) <= set(internal_indices)
+            assert [e["event_type"] for e in observer_q] == \
+                internal_observable_types
         # internal has directly-leaky events; observer deliberately does not.
         assert any(e["event_type"] == "filter_check" for e in internal_events)
         assert "extra" in internal_events[0]
+
+
+def test_observer_index_no_longer_encodes_internal_event_count(run_a):
+    """R1 regression: observer event_index must NOT reuse the sparse internal
+    index. Reusing it would let the gaps (count/position of removed internal
+    events) leak through. The internal layer must keep its exact original
+    numbering; the observer must be dense and provably different from the raw
+    positions whenever internal-only events were actually removed.
+    """
+    _, _, outdir, _ = run_a
+    for group in GROUPS:
+        internal_rows = load_jsonl(
+            outdir / f"internal_diagnostics_{group}.jsonl")
+        observer_rows = load_jsonl(outdir / f"observer_proxy_{group}.jsonl")
+        int_events = [r for r in internal_rows if "event_type" in r]
+        obs_events = [r for r in observer_rows if "event_type" in r]
+        gap_exercised = False
+        for q in range(N_QUERIES):
+            int_q = [r for r in int_events if r["query_id"] == q]
+            obs_q = [r for r in obs_events if r["query_id"] == q]
+            # Raw positions of the very same surviving events, as recorded in
+            # the untouched internal diagnostics layer.
+            raw_observable = [
+                r["event_index"] for r in int_q
+                if r["event_type"] not in FORBIDDEN_OBS_EVENTS
+            ]
+            dense = [r["event_index"] for r in obs_q]
+            # Internal numbering is unchanged: enumerate() over internal rows.
+            assert [r["event_index"] for r in int_q] == list(range(len(int_q)))
+            # Observer numbering is dense and independent.
+            assert dense == list(range(len(dense)))
+            if raw_observable != list(range(len(raw_observable))):
+                gap_exercised = True
+                # This is the crucial difference: the old code wrote
+                # raw_observable into the observer; if it still did, dense
+                # would have to equal it and this assertion would fail.
+                assert dense != raw_observable
+        assert gap_exercised, "fixture must exercise removed internal events"
 
 
 def test_internal_authorization_change_does_not_enter_observer_proxy(
