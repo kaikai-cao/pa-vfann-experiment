@@ -876,9 +876,21 @@ n_{\mathrm{CONFIRM}} = \left\lceil \max\left(618.26\,\hat\sigma_d^2,\;30\right)\
   \(s_i=\dfrac{I_{A0,i}+I_{A1,i}}{2}\)，其中 \(I_{A0,i},I_{A1,i}\in\{0,1\}\) 分别是第
   \(i\) 个 pair 的 A0 / A1 bundle 是否分类正确，故 \(s_i\in\{0,0.5,1\}\)。在 A0/A1
   标签平衡（每 pair 各贡献一个 label-0 与一个 label-1 bundle）条件下，单折 BA 可写
-  为该折验证 pair 的 \(s_i\) 均值：
-  \(\mathrm{BA}_{\text{fold}}=\dfrac{2}{N/5}\sum_{i\in\text{val}}s_i
-  =\dfrac{1}{N/5}\sum_{i\in\text{val}}(I_{A0,i}+I_{A1,i})=(\mathrm{TPR}+\mathrm{TNR})/2\)。
+  为该折验证 pair 的 \(s_i\) 均值。定义 \(m=N/5\) 为该折验证 pair 数，则：
+  \[
+  \boxed{
+  \begin{aligned}
+  \mathrm{BA}_{\mathrm{fold}}
+  &=\frac{1}{m}\sum_{i\in\mathrm{val}}s_i\\
+  &=\frac{1}{2m}\sum_{i\in\mathrm{val}}(I_{A0,i}+I_{A1,i})\\
+  &=\frac{\mathrm{TPR}+\mathrm{TNR}}{2}
+  \end{aligned}
+  }
+  \]
+  其中：
+  \[
+  s_i=\frac{I_{A0,i}+I_{A1,i}}{2}
+  \]
 
   **方差上界（不依赖 A0/A1 零协方差）**：因 \(0\le s_i\le1\)，对任意分布都有
   \(\operatorname{Var}(s_i)\le (1-0)^2/4 = 1/4\)（有界变量方差上界）。5 折
